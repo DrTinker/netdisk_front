@@ -1,7 +1,6 @@
 // ignore_for_file: unrelated_type_equality_checks
 
 import 'package:flutter_learn/helper/md5.dart';
-import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_learn/conf/const.dart';
 import 'package:flutter_learn/conf/url.dart';
@@ -15,11 +14,14 @@ import '../helper/convert.dart';
 import '../helper/storage.dart';
 
 class TransController extends GetxController {
-  List<TransObj> uploadList = [];
-  List<TransObj> downloadList = [];
+  TransList uploadList = TransList(uploadFlag, transProcess);
+  TransList downloadList = TransList(downloadFlag, transProcess);
 
-  List<TransObj> uploadFailList = [];
-  List<TransObj> downloadFailList = [];
+  TransList uploadFailList = TransList(uploadFlag, transFail);
+  TransList downloadFailList = TransList(downloadFlag, transFail);
+
+  TransList uploadSuccessList = TransList(uploadFlag, transSuccess);
+  TransList downloadSuccessList = TransList(downloadFlag, transSuccess);
 
   // 用户登录
   String token = "";
@@ -34,15 +36,52 @@ class TransController extends GetxController {
     if (token == "") {
       token = store.getStorage(userToken);
     }
-    TransObj t1 = TransObj('测试1', 'png', '/root/test/测试.png', 2000, '');
-    t1.setCurSize(200);
+    // 注入token
+    uploadList.token = token;
+    downloadList.token = token;
+    uploadFailList.token = token;
+    downloadFailList.token = token;
+    uploadSuccessList.token = token;
+    downloadSuccessList.token = token;
+    // 获取数据
+    getTransData();
+    // TransObj t1 = TransObj('测试1', 'png', '/root/test/测试.png', 2000, '');
+    // t1.setCurSize(200);
 
-    TransObj t2 = TransObj('测试2', 'png', '/root/test/测试.png', 2000, '');
-    t2.setCurSize(1000);
+    // TransObj t2 = TransObj('测试2', 'png', '/root/test/测试.png', 2000, '');
+    // t2.setCurSize(1000);
+  }
 
-    uploadList.add(t1);
-    uploadList.add(t2);
-    downloadList.add(t1);
+  // 获取传输
+  getTransData() {
+    uploadList.getTransList(false);
+    downloadList.getTransList(false);
+    uploadFailList.getTransList(false);
+    downloadFailList.getTransList(false);
+    uploadSuccessList.getTransList(false);
+    downloadSuccessList.getTransList(false);
+    update();
+  }
+
+  // 翻页
+  getMoreData(int flag) {
+    switch (flag) {
+      case 0:
+        uploadList.getMoreData();
+      case 1:
+        downloadList.getMoreData();
+      case 2:
+        uploadFailList.getMoreData();
+      case 3:
+        downloadFailList.getMoreData();
+      case 4:
+        uploadSuccessList.getMoreData();
+      case 5:
+        downloadSuccessList.getMoreData();
+      default:
+        print('error trans list idx');
+    }
+    update();
   }
 
   doUpload(String parentId, List<PlatformFile> files) async{
@@ -54,9 +93,9 @@ class TransController extends GetxController {
       if (fileReadStream == null) {
         throw Exception('Cannot read file from null stream');
       }
-      obj.setReadStream(fileReadStream);
+      obj.fileReadStream = fileReadStream;
       // 加入队列
-      uploadList.add(obj);
+      uploadList.transList.add(obj);
       // 判断文件大小决定传输策略
       if (file.size >= largeMark) {
         // TODO 分块上传
@@ -68,15 +107,16 @@ class TransController extends GetxController {
   }
 
   // 初始化分块上传
-  initUploadPart(TransObj file) async {
+  initUploadPart(TransObj trans) async {
     Map<String, String> headers = {
       'Authorization': token,
     };
     Map<String, String> body = {
-      'hash': file.hash,
-      'name': file.fullName,
-      'parent_uuid': file.parentId,
-      'size': (file.totalSize).toString(),
+      'hash': trans.hash,
+      'name': trans.fullName,
+      'local_path': trans.localPath,
+      'parent_uuid': trans.parentId,
+      'size': (trans.totalSize).toString(),
     };
     await NetWorkHelper.requestPost(
       initUploadPartUrl,
@@ -85,17 +125,12 @@ class TransController extends GetxController {
         // 秒传
         if (code == quickUploadCode) {
           // 设置进度为100
-          file.curSize = file.totalSize;
+          trans.curSize = trans.totalSize;
           MsgToast().customeToast('有文件上传成功了，快去看看吧');
           return;
         }
         // 非秒传，获取数据
-        file.partInfo = TransPart(
-          data['chunk_size'],
-          data['chunk_count'],
-          data['chunk_list'],
-          data['upload_id'],
-        );
+        
       },
       body: body,
       headers: headers,

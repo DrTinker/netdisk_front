@@ -99,9 +99,9 @@ class _TransBoxState extends State<TransBox> {
   @override
   Widget build(BuildContext context) {
     if (flag == uploadFlag) {
-      objList = tc.uploadList;
+      objList = tc.uploadList.transList;
     } else {
-      objList = tc.downloadList;
+      objList = tc.downloadList.transList;
     }
     return ListTile(
       leading: Image.asset(objList[index].icon, height: 50, width: 50,),

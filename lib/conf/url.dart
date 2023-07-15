@@ -8,7 +8,8 @@ const moveUrl = "$baseUrl/object/batch/move";
 const deleteUrl = "$baseUrl/object/batch/delete";
 const renameUrl = "$baseUrl/object/rename";
 
-const uploadUrl = "$baseUrl/object/upload/total";
-const initUploadPartUrl = "$baseUrl/upload_part/init";
-const uploadPartUrl = "$baseUrl/upload_part/upload";
-const completeUploadPartUrl = "$baseUrl/upload_part/complete";
+const uploadUrl = "$baseUrl/trans/upload/total";
+const initUploadPartUrl = "$baseUrl/trans/upload/init";
+const uploadPartUrl = "$baseUrl/trans/upload/part";
+const completeUploadPartUrl = "$baseUrl/trans/upload/complete";
+const transInfoUrl = "$baseUrl/trans/info";

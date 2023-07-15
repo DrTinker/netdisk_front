@@ -3,10 +3,10 @@ import 'package:flutter_learn/components/toast.dart';
 import 'package:flutter_learn/components/trans_box.dart';
 import 'package:flutter_learn/conf/const.dart';
 import 'package:flutter_learn/controller/trans_controller.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 
 import '../models/trans_model.dart';
 
+// ignore: must_be_immutable
 class TransList extends StatefulWidget {
   TransList({super.key, required this.tc, required this.flag});
   TransController tc;
@@ -22,36 +22,35 @@ class _TransListState extends State<TransList> {
   int flag;
   List<TransObj> objList = [];
 
-  // 监听触底
-  ScrollController _scrollController = ScrollController();
   @override
   void initState() {
     super.initState();
-    // 设置触底监听器
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
-        MsgToast().customeToast('到底了');
-      }
-    });
   }
 
   // 渲染widget
   List<Widget> _getRunningData() {
     if (flag == uploadFlag) {
-      objList = tc.uploadList;
+      objList = tc.uploadList.transList;
     } else {
-      objList = tc.downloadList;
+      objList = tc.downloadList.transList;
     }
     List<Widget> list = [];
     for (var i = 0; i < objList.length; i++) {
       list.add(TransBox(
-        //obj: fc.fileObjs[i],
         index: i,
         tc: tc,
         flag: flag,
       ));
     }
+    Widget moreBtn = TextButton(
+      child: const Text('更多数据'),
+      onPressed: () {
+        MsgToast().customeToast("更多数据正在赶来");
+      },
+    );
+    Widget padding = const SizedBox(height: 30);
+    list.add(moreBtn);
+    list.add(padding);
     return list;
   }
 
@@ -61,24 +60,42 @@ class _TransListState extends State<TransList> {
     return ListView(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            const SizedBox(width: 10,),
             Text('正在进行, 共${objList.length}个'),
+            const Spacer(),
             TextButton(onPressed: (){
               MsgToast().customeToast('按钮1');
             }, child: const Text('全部暂停')),
+            const SizedBox(width: 10,),
           ],
         ),
         Column(
           children: list,
         ),
+        
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            const SizedBox(width: 10,),
             Text('失败任务, 共${objList.length}个'),
+            const Spacer(),
             TextButton(onPressed: (){
               MsgToast().customeToast('按钮2');
             }, child: const Text('全部重新开始')),
+            const SizedBox(width: 10,),
+          ],
+        ),
+        Column(
+          children: list,
+        ),
+
+        Row(
+          // mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(width: 10,),
+            Text('已完成任务, 共${objList.length}个'),
           ],
         ),
         Column(
