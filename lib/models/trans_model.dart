@@ -9,22 +9,25 @@ import '../helper/convert.dart';
 import '../helper/net.dart';
 
 class TransObj {
-  String transID=""; // 传输uuid
-  String fileUuid=""; // 文件file_uuid
-  String icon=""; 
-  String fullName="";
-  String ext="";
+  // 基本信息
+  String transID = ""; // 传输uuid
+  String fileUuid = ""; // 文件file_uuid
+  String icon = "";
+  String fullName = "";
+  String ext = "";
   String hash = "";
   String localPath = ""; // 本地文件地址
   String fileKey = ""; // 云端地址
   String parentId = ""; // 父节点file_uuid
-  int totalSize=0; // 文件总大小
-  int curSize=0; // 已上传大小
-  int startTime=0;
+  int totalSize = 0; // 文件总大小
+  int curSize = 0; // 已上传大小
+  int startTime = 0;
+  // 状态
+  bool running = false; // 新创建的trans对象均为暂停状态
   // 分块上传
-  int chunkSize=0;
-  int chunkCount=0;
-  List<int> chunkList=[]; // 已上传的分块列表
+  int chunkSize = 0;
+  int chunkCount = 0;
+  List<int> chunkList = []; // 已上传的分块列表
   Stream<List<int>>? fileReadStream;
 
   static TransObj fromMap(Map trans) {
@@ -43,13 +46,16 @@ class TransObj {
       obj.curSize = obj.totalSize;
     }
     obj.chunkSize = trans['ChunkSize'];
-    for (var chunk in trans['ChunkList']) {
-      obj.chunkList.add(chunk);
+    if (trans['chunk_list'] != null) {
+      for (var chunk in trans['ChunkList']) {
+        obj.chunkList.add(int.parse(chunk));
+      }
     }
     return obj;
   }
-  
-  TransObj(String fullName, String? ext, String? local, int totalSize, String? parentId) {
+
+  TransObj(String fullName, String? ext, String? local, int totalSize,
+      String? parentId) {
     icon = 'assets/images/nodata.png';
     this.fullName = fullName;
     ext = ext;
@@ -58,7 +64,7 @@ class TransObj {
     }
     localPath = local!;
     // 默认在根路径下
-    if (parentId!=null) {
+    if (parentId != null) {
       this.parentId = parentId;
     } else {
       var store = SyncStorage();
@@ -66,19 +72,21 @@ class TransObj {
         parentId = store.getStorage(userStartDir);
       }
     }
-    
+
     // 初始化时先置为0，到发请求时再计算
     this.totalSize = totalSize;
-    startTime = DateTime.now().second;
   }
 }
 
+// TODO 优化为双向链表
 class TransList {
   List<TransObj> transList = [];
+  // 用于快速索引list中的对象，执行队列移动操作
+  // Map<TransObj, int> indexMap = {};
   int page = 1;
-  String token="";
-  int mod=0; // 上传还是下载
-  int status=0; // 状态 进行 成功 失败
+  String token = "";
+  int mod = 0; // 上传还是下载
+  int status = 0; // 状态 进行 成功 失败
 
   TransList(int mod, int status) {
     this.mod = mod;
@@ -103,13 +111,15 @@ class TransList {
         // 刷新清空
         if (!append) {
           transList.clear();
+          // indexMap.clear();
           // 刷新则重置页码
           page = 1;
         }
-        // file是map
-        for (var trans in trans_list) {
-          TransObj transObj = TransObj.fromMap(trans);
+        for (int i = 0; i < trans_list.length; i++) {
+          TransObj transObj = TransObj.fromMap(trans_list[i]);
           transList.add(transObj);
+          // TODO 处理同一页重复请求错误
+          // indexMap[transObj] = i;
         }
       },
       params: params,

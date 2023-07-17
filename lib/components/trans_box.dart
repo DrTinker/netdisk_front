@@ -8,19 +8,21 @@ import 'package:get/get_connect/http/src/utils/utils.dart';
 
 class TransBox extends StatefulWidget {
   TransBox(
-      {super.key, required this.tc, required this.index, required this.flag});
+      {super.key, required this.tc, required this.index, required this.status, required this.flag});
   int index;
-  int flag;
+  int flag; // 上传下载标志
+  int status; // 传输状态
   TransController tc;
   @override
   State<TransBox> createState() =>
-      _TransBoxState(index: index, tc: tc, flag: flag);
+      _TransBoxState(index: index, tc: tc, status: status, flag: flag);
 }
 
 class _TransBoxState extends State<TransBox> {
-  _TransBoxState({required this.tc, required this.index, required this.flag});
+  _TransBoxState({required this.tc, required this.index, required this.status, required this.flag});
   int index;
-  int flag;
+  int flag; // 上传下载标志
+  int status; // 传输状态
   TransController tc;
 
   List<TransObj> objList = [];
@@ -48,7 +50,7 @@ class _TransBoxState extends State<TransBox> {
           height: 3,
           width: 200,
           child: LinearProgressIndicator(
-            value: obj.curSize/obj.totalSize,
+            value: obj.totalSize==0 ? 0 : obj.curSize/obj.totalSize,
             backgroundColor: Colors.grey,
             valueColor: AlwaysStoppedAnimation(Colors.blue),
           ),
@@ -85,23 +87,30 @@ class _TransBoxState extends State<TransBox> {
   }
 
   String parseSpeed(int cur, int time) {
-    int dur = DateTime.now().second - time;
-    double speed = cur.toDouble() / dur.toDouble();
+    double dur = (DateTime.now().microsecondsSinceEpoch - time) / 1000000;
+    double speed = cur.toDouble() / dur;
     if (speed>GB) {
+      speed = speed / GB;
       return '${speed.toStringAsFixed(2)}GB/s';
     }
     if (speed>MB) {
+      speed = speed / MB;
       return '${speed.toStringAsFixed(2)}MB/s';
     }
+    speed /= KB;
     return '${speed.toStringAsFixed(2)}KB/s';
   }
 
   @override
   Widget build(BuildContext context) {
-    if (flag == uploadFlag) {
-      objList = tc.uploadList.transList;
-    } else {
-      objList = tc.downloadList.transList;
+    // 根据传输状态和类型选择队列
+    switch(status) {
+      case transProcess:
+        objList = (flag==uploadFlag) ? tc.uploadList.transList : tc.downloadList.transList;
+      case transSuccess:
+        objList = (flag==uploadFlag) ? tc.uploadSuccessList.transList : tc.downloadSuccessList.transList;
+      case transFail:
+        objList = (flag==uploadFlag) ? tc.uploadFailList.transList : tc.downloadList.transList;
     }
     return ListTile(
       leading: Image.asset(objList[index].icon, height: 50, width: 50,),

@@ -74,10 +74,9 @@ class NetWorkHelper {
     }
   }
 
-  ///dio 实现文件上传
+  //dio 实现文件上传
   static Future<dynamic> fileUplod(String url, String token, onSuccess success, TransObj file, 
-      {Map<String, dynamic>? body, Convert? transform, onError? error, 
-      onProgress? progress, List<int>? fileBytes}) async{
+      {Map<String, dynamic>? body, Convert? transform, onError? error, onProgress? progress}) async{
     ///创建Dio
     Dio dio = Dio();
     // 设置请求头
@@ -85,11 +84,13 @@ class NetWorkHelper {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
 
     try {
-      if (fileBytes != null) {
-        body?["files"] = await MultipartFile.fromBytes(fileBytes, filename: file.fullName);
-      } else {
+      if (body?["files"]==null) {
         body?["files"] = await MultipartFile.fromFile(file.localPath, filename: file.fullName);
+      } else {
+        List<int> fileBytes = body?["files"];
+        body?["files"] = await MultipartFile.fromBytes(fileBytes, filename: file.fullName);
       }
+      
       // 通过FormData
       FormData formData = FormData.fromMap(body!);
       ///发送post
@@ -107,7 +108,6 @@ class NetWorkHelper {
         error(statusErrorCode, e.toString());
       }
     }
-
   }
 
   ///处理response

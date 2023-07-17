@@ -140,9 +140,10 @@ class _OpenFilePopContentState extends State<OpenFilePopContent> {
                   return;
                 }
                 try {
-                  // 调用上传接口
-                  tc.doUpload(fc.uploadPath, files);
                   Get.back();
+                  // 调用上传接口
+                  tc.addToUpload(fc.uploadPath, files);
+                  
                 } catch (e) {
                   MsgToast().customeToast('上传失败');
                   return;
