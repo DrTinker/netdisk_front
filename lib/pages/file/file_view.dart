@@ -10,6 +10,7 @@ import 'package:flutter_learn/components/upload_floating.dart';
 import 'package:flutter_learn/controller/file_controller.dart';
 import 'package:get/get.dart';
 
+import '../../conf/const.dart';
 import '../../conf/navi.dart';
 import '../../controller/trans_controller.dart';
 
@@ -21,8 +22,13 @@ class FilePage extends GetView<FileController> {
   // 检测退出逻辑
   DateTime lastPopTime = DateTime.now();
 
+  FilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
+    TransController tc = Get.find<TransController>(tag: tcPerTag);
+    print('file page tc: ${tc.hashCode}');
+    
     PreferredSizeWidget _getAppBar(FileController fc) {
       // 后退按钮
       Widget leading = IconButton(
@@ -50,25 +56,22 @@ class FilePage extends GetView<FileController> {
                   MsgToast().customeToast('请先选择要操作的文件');
                   return;
                 }
-                TaskPop().showPop(fc);
+                TaskPop().showPop(fc, tc);
               },
               icon: Icon(Icons.keyboard_control)),
         ],
       );
     }
 
-    TransController tc = Get.find<TransController>();
-    print('file page tc: ${tc.hashCode}');
     return GetBuilder<FileController>(
-      //init: FileController(),
+      init: Get.find<FileController>(tag: fcPerTag),
       builder: (controller) {
         return WillPopScope(
             // TODO 退出逻辑
             onWillPop: () async {
               // 根目录执行退出app逻辑
               if (controller.isRoot()) {
-                if (lastPopTime == null ||
-                    DateTime.now().difference(lastPopTime!) >
+                if (DateTime.now().difference(lastPopTime) >
                         Duration(seconds: 1)) {
                   lastPopTime = DateTime.now();
 
@@ -91,7 +94,6 @@ class FilePage extends GetView<FileController> {
                   FloatingActionButtonLocation.centerDocked,
               body: FileTree(
                 select: true,
-                ext: '',
                 fc: controller,
               ),
               bottomNavigationBar: BottomBar(

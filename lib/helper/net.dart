@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_learn/helper/convert.dart';
-import 'package:flutter_learn/helper/md5.dart';
 import 'package:flutter_learn/models/trans_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:developer' as developer;
@@ -18,9 +17,12 @@ const statusErrorCode = -200;
 
 // get参数在url末尾拼接，post参数写入body中
 class NetWorkHelper {
- //get request
+  //get request
   static Future requestGet(String url, onSuccess success,
-      {Map<String, String>? params, Map<String, String>? headers, Convert? transform, onError? error}) async {
+      {Map<String, String>? params,
+      Map<String, String>? headers,
+      Convert? transform,
+      onError? error}) async {
     url = joinParams(params, url);
     try {
       Uri uri = Uri.parse(url);
@@ -50,7 +52,11 @@ class NetWorkHelper {
 
   ///post request
   static Future<dynamic> requestPost(String url, onSuccess success,
-      {Map<String, String>? params, Map<String, dynamic>? body, Map<String, String>? headers, Convert? transform, onError? error}) async {
+      {Map<String, String>? params,
+      Map<String, dynamic>? body,
+      Map<String, String>? headers,
+      Convert? transform,
+      onError? error}) async {
     url = joinParams(params, url);
     // 判断是否为json类型
     String bodyJson = "";
@@ -75,8 +81,12 @@ class NetWorkHelper {
   }
 
   //dio 实现文件上传
-  static Future<dynamic> fileUplod(String url, String token, onSuccess success, TransObj file, 
-      {Map<String, dynamic>? body, Convert? transform, onError? error, onProgress? progress}) async{
+  static Future<dynamic> fileUplod(
+      String url, String token, onSuccess success, TransObj file,
+      {Map<String, dynamic>? body,
+      Convert? transform,
+      onError? error,
+      onProgress? progress}) async {
     ///创建Dio
     Dio dio = Dio();
     // 设置请求头
@@ -84,24 +94,66 @@ class NetWorkHelper {
     dio.options.headers['Content-Type'] = 'multipart/form-data';
 
     try {
-      if (body?["files"]==null) {
-        body?["files"] = await MultipartFile.fromFile(file.localPath, filename: file.fullName);
+      if (body?["files"] == null) {
+        body?["files"] = await MultipartFile.fromFile(file.localPath,
+            filename: file.fullName);
       } else {
         List<int> fileBytes = body?["files"];
-        body?["files"] = await MultipartFile.fromBytes(fileBytes, filename: file.fullName);
+        body?["files"] =
+            await MultipartFile.fromBytes(fileBytes, filename: file.fullName);
       }
-      
+
       // 通过FormData
       FormData formData = FormData.fromMap(body!);
+
       ///发送post
-      Response response = await dio.post(url, data: formData,
-        ///这里是发送请求回调函数
-        ///[progress] 当前的进度
-        ///[total] 总进度
-        onSendProgress: progress
-      );
+      Response response = await dio.post(url,
+          data: formData,
+
+          ///这里是发送请求回调函数
+          ///[progress] 当前的进度
+          ///[total] 总进度
+          onSendProgress: progress);
+
       ///服务器响应结果
       checkDioResp(response, transform, success, error);
+    } catch (e) {
+      developer.log("package:net/network.dart error upload:$e");
+      if (error != null) {
+        error(statusErrorCode, e.toString());
+      }
+    }
+  }
+
+  // dio实现文件下载
+  static Future<dynamic> fileDownload(
+      String url, onSuccess success, String savePath,
+      {Map<String, dynamic>? param,
+      TransObj? file,
+      String? token,
+      String? range,
+      Convert? transform,
+      onError? error,
+      onProgress? progress}) async {
+    ///创建Dio
+    Dio dio = Dio();
+    // 设置请求头
+    dio.options.headers['Authorization'] = token;
+    dio.options.headers['Content-Type'] = 'multipart/form-data';
+    dio.options.headers['Range'] = range;
+
+    try {
+      ///发送post
+      Response response = await dio.download(
+        url,
+        savePath,
+        queryParameters: param,
+        onReceiveProgress: progress,
+        deleteOnError: true, // 出错删除已下载的文件
+      );
+
+      ///服务器响应结果
+      checkDownloadResp(response, savePath, success, error);
     } catch (e) {
       developer.log("package:net/network.dart error upload:$e");
       if (error != null) {
@@ -126,7 +178,7 @@ class NetWorkHelper {
         error(response.statusCode, response.body);
       }
     }
-  }  
+  }
 
   static void checkDioResp(Response response, Convert? transform,
       onSuccess success, onError? error) {
@@ -140,7 +192,22 @@ class NetWorkHelper {
         error(response.statusCode!, "fail get data");
       }
     }
-  }   
+  }
+
+  static void checkDownloadResp(
+      Response response, String savePath, onSuccess success, onError? error) {
+    // 全部下载或者部分下载
+    if (response.statusCode == 200 || response.statusCode == 206) {
+      dynamic data = response.data;
+      developer.log("save to $savePath");
+      success(data);
+    } else {
+      developer.log('Request get failed with status: ${response.statusCode}');
+      if (error != null) {
+        error(response.statusCode!, "fail get data");
+      }
+    }
+  }
 }
 
 Future<String> getFileHash(String filePath) async {

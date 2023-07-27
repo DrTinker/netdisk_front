@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_learn/components/file_tree.dart';
 import 'package:flutter_learn/components/mkdir_pop.dart';
 import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/controller/trans_controller.dart';
 import 'package:flutter_learn/helper/convert.dart';
 import 'package:get/get.dart';
 
@@ -85,7 +84,8 @@ class _SelectPopContentState extends State<SelectPopContent> {
             // dotask一定要在clear前完成
             // 执行任务
             if (index==uploadCode) {
-              outerFC.setUploadPath(taskFC.curDir);
+              String uploadPath = taskFC.getNameListAsPath();
+              outerFC.setUpload(taskFC.curDir, uploadPath);
             } else {
               await taskFC.doTask(index);
             }
@@ -110,7 +110,7 @@ class _SelectPopContentState extends State<SelectPopContent> {
           appBar: _getAppBar(),
           body: FileTree(
             select: false,
-            ext: 'folder',
+            exts: const ['folder'],
             fc: controller,
           ),
           bottomNavigationBar: _getBottomBar(),
@@ -125,7 +125,6 @@ class SelectPop {
     // 弹出
     FileController tmp = deepCopyFC(fc);
     // print('tmp==fc? ${tmp==fc}');
-    tmp.setExtFilter('folder');
     Get.bottomSheet(
       Container(
         height: 700,

@@ -2,7 +2,6 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_learn/components/select_pop.dart';
 import 'package:flutter_learn/components/toast.dart';
@@ -24,6 +23,7 @@ class OpenFilePopContent extends StatefulWidget {
       _OpenFilePopContentState(tc: tc, fc: fc);
 }
 
+// TODO 大文件读取优化
 class _OpenFilePopContentState extends State<OpenFilePopContent> {
   _OpenFilePopContentState({required this.tc, required this.fc});
   TransController tc;
@@ -135,15 +135,14 @@ class _OpenFilePopContentState extends State<OpenFilePopContent> {
           },
           trailing: ElevatedButton(
               onPressed: () {
-                if (fc.uploadPath == "") {
+                if (fc.uploadDir == "") {
                   MsgToast().customeToast('请先选择上传位置');
                   return;
                 }
                 try {
                   Get.back();
                   // 调用上传接口
-                  tc.addToUpload(fc.uploadPath, files);
-                  
+                  tc.addToUpload(fc.uploadDir, fc.uploadPath, files);
                 } catch (e) {
                   MsgToast().customeToast('上传失败');
                   return;

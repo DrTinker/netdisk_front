@@ -1,13 +1,14 @@
 import 'package:flutter_learn/controller/file_controller.dart';
 import 'package:get/get.dart';
 
+import '../conf/const.dart';
 import '../controller/trans_controller.dart';
 
 class FileBinding implements Bindings {
   @override
   void dependencies() {
-    // 用的时候才注册，controller为单例，fenix保证别的界面在binding时也是同一个controller
-    Get.lazyPut<FileController>(() => FileController());
-    Get.lazyPut<TransController>(() => TransController());
+    // 进入app时在filepage先把fc和tc初始化，并设置为永久存在
+    Get.put<FileController>(FileController(), permanent: true, tag: fcPerTag);
+    Get.put<TransController>(TransController(), permanent: true, tag: tcPerTag);
   }
 }

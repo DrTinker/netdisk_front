@@ -4,6 +4,8 @@ const userToken = "user_token";
 const userInfo = "user_info";
 const userStartDir = "user_start_dir";
 
+const defaultSysPrefix = "test"; // 文件系统默认前缀
+
 const taskTypeList = ['复制', '移动', '删除', '下载', '分享', '重命名'];
 const taskIconList = [Icon(Icons.folder_copy), Icon(Icons.file_open), Icon(Icons.folder_delete), 
                       Icon(Icons.file_download), Icon(Icons.folder_shared), Icon(Icons.folder_special)];
@@ -35,3 +37,17 @@ const processWait = 0;
 const processRunning = 1;
 const processSuspend = 2;
 const processFinish = 3;
+
+// 下载文件就绪
+const readyWait = '0';
+const readyDone = '1';
+const readyAbort = '2';
+
+// controller tag
+const fcPerTag = "file_bus";
+const tcPerTag = "trans_bus";
+
+// 音乐播放模式
+const audioCycle = 0; // 列表循环
+const audioLoop = 1; // 单曲循环
+const audioRandom = 2; // 列表随机

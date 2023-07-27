@@ -50,7 +50,7 @@ class _RenamePopContentState extends State<RenamePopContent> {
   }
 
   Widget buildNameTextField() {
-    List<String> names = SplitName(fullName);
+    List<String> names = splitName(fullName);
     String name = names[0];
     String ext = names[1];
     return TextFormField(
@@ -107,7 +107,7 @@ class RenamePop{
     // 只有一个元素
     fc.taskMap.forEach((key, value) {
       fileID = key;
-      fileName = value;
+      fileName = '${value.name}.${value.ext}';
     });
     Get.defaultDialog(
       title: '重命名',

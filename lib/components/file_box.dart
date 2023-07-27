@@ -4,6 +4,8 @@ import 'package:flutter_learn/controller/file_controller.dart';
 import 'package:flutter_learn/models/file_model.dart';
 import 'package:flutter_learn/components/toast.dart';
 
+import '../helper/parse.dart';
+
 class FileBox extends StatefulWidget {
   FileBox(
       {Key? key, required this.index, required this.select, required this.fc})
@@ -27,7 +29,7 @@ class _FileBoxState extends State<FileBox> {
   @override
   Widget build(BuildContext context) {
     Widget _getTrailing() {
-      File obj = fc.fileObjs[index];
+      FileObj obj = fc.fileObjs[index];
       setState(() {
         _isSelect = fc.taskMap.containsKey(obj.uuid);
       });
@@ -39,7 +41,7 @@ class _FileBoxState extends State<FileBox> {
           });
           // 加入taskList
           if (_isSelect) {
-            fc.taskMap[obj.uuid] = '${obj.name}.${obj.ext}';
+            fc.taskMap[obj.uuid] = obj;
             print('taskMap: ${fc.taskMap}');
           } else {
             fc.taskMap.remove(obj.uuid);
@@ -58,12 +60,23 @@ class _FileBoxState extends State<FileBox> {
       return trail;
     }
 
-    String _getTitle() {
-      File obj = fc.fileObjs[index];
+    Widget _getTitle() {
+      FileObj obj = fc.fileObjs[index];
       if (obj.ext == 'folder') {
-        return obj.name;
+        return Text(obj.name);
       }
-      return '${obj.name}.${obj.ext}';
+      return Text('${obj.name}.${obj.ext}');
+    }
+
+    Widget _getSubTitle() {
+      FileObj obj = fc.fileObjs[index];
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(obj.updatedAt),
+          Text(parseSize(obj.size)),
+        ],
+      );
     }
 
     fileHandler() {
@@ -71,23 +84,62 @@ class _FileBoxState extends State<FileBox> {
         MsgToast().customeToast('请先退出选择模式');
         return;
       }
-      File obj = fc.fileObjs[index];
+      FileObj obj = fc.fileObjs[index];
       switch (obj.ext) {
         case "folder":
           fc.enter(obj.uuid, obj.name);
           break;
+        // pic
         case "jpg":
+          fc.viewPic(obj);
+          break;
+        case "jpeg":
+          fc.viewPic(obj);
+          break;
+        case "png":
+          fc.viewPic(obj);
+          break;
+        // video
+        case "mp4":
+          fc.playVedio(obj);
+          break;
+        case "flv":
+          fc.playVedio(obj);
+          break;
+        case "avi":
+          fc.playVedio(obj);
+          break;
+        // audio 'mp3', 'wma', 'wav', 'ape', 'flac', 'ogg', 'aac'
+        case "mp3":
+          fc.playAudio(obj);
+          break;
+        case "wma":
+          fc.playAudio(obj);
+          break;
+        case "m4a":
+          fc.playAudio(obj);
+          break;
+        case "wav":
+          fc.playAudio(obj);
+        case "ape":
+          fc.playAudio(obj);
+        case "flac":
+          fc.playAudio(obj);
+        case "ogg":
+          fc.playAudio(obj);
+        case "aac":
+          fc.playAudio(obj);
           break;
         default:
-          MsgToast().customeToast('文件已损坏');
+          MsgToast().customeToast('暂不支持该类型文件预览');
           break;
       }
     }
 
     return ListTile(
-      leading: Image.asset(fc.fileObjs[index].icon),
-      title: Text(_getTitle()),
-      subtitle: Text(fc.fileObjs[index].updatedAt),
+      leading: fc.fileObjs[index].icon,
+      title: _getTitle(),
+      subtitle: _getSubTitle(),
       trailing: fc.showAddTask ? _getTrailing() : null,
       onTap: () {
         fileHandler();
@@ -95,8 +147,8 @@ class _FileBoxState extends State<FileBox> {
       onLongPress: () {
         // 允许选择，则长按出现选择按钮
         if (select) {
-          File obj = fc.fileObjs[index];
-          fc.taskMap[obj.uuid] = '${obj.name}.${obj.ext}';
+          FileObj obj = fc.fileObjs[index];
+          fc.taskMap[obj.uuid] = obj;
           fc.switchShowAddTask(true);
         }
       },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_learn/components/audio_player.dart';
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({super.key});
@@ -10,8 +11,15 @@ class UserInfoPage extends StatefulWidget {
 class _UserInfoPageState extends State<UserInfoPage> {
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('用户信息界面'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("音频播放"),
+      ),
+      body: Column(
+        children: [
+          
+        ],
+      ),
     );
   }
 }

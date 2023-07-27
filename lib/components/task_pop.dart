@@ -6,18 +6,21 @@ import 'package:flutter_learn/components/select_pop.dart';
 import 'package:flutter_learn/components/toast.dart';
 import 'package:flutter_learn/conf/const.dart';
 import 'package:flutter_learn/controller/file_controller.dart';
+import 'package:flutter_learn/controller/trans_controller.dart';
 import 'package:get/get.dart';
 
 class TaskPopContent extends StatefulWidget {
-  TaskPopContent({super.key, required this.fc});
+  TaskPopContent({super.key, required this.fc, required this.tc});
   FileController fc;
+  TransController tc;
   @override
-  State<TaskPopContent> createState() => _TaskPopContentState(fc: fc);
+  State<TaskPopContent> createState() => _TaskPopContentState(fc: fc, tc: tc);
 }
 
 class _TaskPopContentState extends State<TaskPopContent> {
-  _TaskPopContentState({required this.fc});
+  _TaskPopContentState({required this.fc, required this.tc});
   FileController fc;
+  TransController tc;
 
   List<Widget> _getList() {
     List<Widget> list = [];
@@ -61,7 +64,12 @@ class _TaskPopContentState extends State<TaskPopContent> {
           Get.back();
         };
       case downloadCode:
-        return (){};
+        return () async{
+          String downloadPath = fc.getNameListAsPath();
+          await tc.addToDownload(fc.curDir, downloadPath, fc.taskMap);
+          fc.clearTaskMap();
+          Get.back();
+        };
       case shareCode:
         return (){};
       case renameCode:
@@ -84,12 +92,12 @@ class _TaskPopContentState extends State<TaskPopContent> {
 }
 
 class TaskPop {
-  showPop(FileController fc) {
+  showPop(FileController fc, TransController tc) {
     Get.bottomSheet(
       Container(
         height: 500,
         color: Colors.white,
-        child: TaskPopContent(fc: fc,),
+        child: TaskPopContent(fc: fc, tc: tc,),
       ),
       backgroundColor: Colors.white,
     );

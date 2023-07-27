@@ -1,7 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_learn/conf/const.dart';
+import 'package:flutter_learn/conf/file.dart';
+import 'package:flutter_learn/helper/file.dart';
+import 'package:flutter_learn/helper/parse.dart';
 import 'package:flutter_learn/helper/storage.dart';
 import 'package:get/get.dart';
 import '../components/toast.dart';
+import '../conf/code.dart';
 import '../models/file_model.dart';
 import '../../conf/url.dart';
 import '../../helper/convert.dart';
@@ -9,9 +14,8 @@ import '../../helper/net.dart';
 
 class FileController extends GetxController {
   // 文件列表
-  List<File> fileObjs = [];
+  List<FileObj> fileObjs = [];
   int page = 1;
-  String extFilter = "";
   // 目录
   List<String> dirList = [];
   List<String> nameList = [];
@@ -20,11 +24,16 @@ class FileController extends GetxController {
   // 文件加入任务列表按钮展示
   bool showAddTask = false;
   // 任务列表
-  Map<String, String> taskMap = {};
+  Map<String, FileObj> taskMap = {};
   // 用户登录
   String token = "";
   // 上传下载相关
+  String uploadDir = "";
   String uploadPath = "";
+  // 图片
+  Map<String, FileObj> imageUrls = {};
+  // 音频
+  Map<String, FileObj> audioUrls = {};
 
   @override
   void onInit() {
@@ -37,7 +46,8 @@ class FileController extends GetxController {
     if (token == "" && curDir == "" && dirList.isEmpty) {
       token = store.getStorage(userToken);
       curDir = store.getStorage(userStartDir);
-      uploadPath = curDir; // 初始化上传路径为根目录
+      uploadDir = curDir; // 初始化上传路径为根目录
+      uploadPath = "我的空间";
       dirList.add(curDir);
       curName = "我的空间";
       nameList.add(curName);
@@ -101,9 +111,127 @@ class FileController extends GetxController {
     getFileObjs(false);
   }
 
-  // 设置后缀名筛选条件
-  setExtFilter(String ext) {
-    extFilter = ext;
+  // 播放视频
+  playVedio(FileObj obj) async {
+    // 查看本地
+    // 拼接地址
+    String dir = getNameListAsPath();
+    String filePath = await getDownloadDir('${obj.name}.${obj.ext}', dir);
+    bool flag = fileExist(filePath);
+    // 传递参数
+    Map<String, String> param = {};
+    param['fullName'] = obj.name;
+    param['size'] = parseSize(obj.size);
+    if (flag) {
+      param['url'] = filePath;
+      Get.toNamed('/video', parameters: param);
+    } else {
+      // 不在本地，请求sign
+      String sign = await getPreSign(obj);
+      param['url'] = sign;
+      Get.toNamed('/video', parameters: param);
+    }
+  }
+
+  // 播放音频
+  playAudio(FileObj obj) async {
+    // 查看本地
+    // 清空map
+    audioUrls.clear();
+    // 遍历当前目录，找到所有图片后缀的文件
+    int index = -1;
+    int cnt = 0;
+    for (int i = 0; i < fileObjs.length; i++) {
+      FileObj f = fileObjs[i];
+      // 是图片
+      if (audioFilter.contains(f.ext)) {
+        // 拼接地址
+        String dir = getNameListAsPath();
+        String filePath = await getDownloadDir('${f.name}.${f.ext}', dir);
+        bool flag = fileExist(filePath);
+        if (flag) {
+          audioUrls[filePath] = f;
+        } else {
+          // 获取文件地址
+          String url = await getPreSign(f);
+          // 加入结果集
+          audioUrls[url] = f;
+        }
+        // 如果是目标，则更新index
+        if (f == obj) {
+          index = cnt;
+        }
+        cnt++;
+      }
+    }
+    // 如果结果为空则返回
+    if (audioUrls.isEmpty || index==-1) {
+      MsgToast().customeToast('获取音频失败');
+      return;
+    }
+    // 成功则跳转图片页面
+    Get.toNamed('/audio', parameters: {'index': index.toString()});
+  }
+  // 查看图片
+  viewPic(FileObj obj) async {
+    // 清空map
+    imageUrls.clear();
+    // 遍历当前目录，找到所有图片后缀的文件
+    int index = -1;
+    int cnt = 0;
+    for (int i = 0; i < fileObjs.length; i++) {
+      FileObj f = fileObjs[i];
+      // 是图片
+      if (picFilter.contains(f.ext)) {
+        // 获取文件地址
+        String url = await getPreSign(f);
+        // 加入结果集
+        imageUrls[url] = f;
+        // 如果是目标，则更新index
+        if (f == obj) {
+          index = cnt;
+        }
+        cnt++;
+      }
+    }
+    // 如果结果为空则返回
+    if (index == -1 || imageUrls.isEmpty) {
+      MsgToast().customeToast('获取图片失败');
+      return;
+    }
+    // 成功则跳转图片页面
+    Get.toNamed('/pic', parameters: {'index': index.toString()});
+  }
+
+  // 获取文件预签名
+  Future<String> getPreSign(FileObj obj) async {
+    String sign = "";
+    // 不在本地，请求sign
+    Map<String, String> headers = {
+      'Authorization': token,
+    };
+    String fileKey = '$defaultSysPrefix/${obj.hash}.${obj.ext}';
+    await NetWorkHelper.requestGet(
+      preSignUrl,
+      (data) {
+        int code = data['code'];
+        // 合并成功
+        if (code == httpSuccessCode) {
+          // 获取预签名
+          sign = data['sign'];
+          return;
+        }
+        // 发生错误
+        MsgToast().customeToast('解析文件地址发生错误');
+      },
+      params: {'fileKey': fileKey},
+      headers: headers,
+      transform: JSONConvert.create(),
+      error: (statusCode, error) {
+        print(error.toString());
+      },
+    );
+    return sign;
   }
 
   // 切换加入任务队列按钮
@@ -141,7 +269,6 @@ class FileController extends GetxController {
     Map<String, String> params1 = {
       'parent_uuid': curDir,
       'page': page.toString(),
-      'ext': extFilter,
     };
     await NetWorkHelper.requestGet(
       url,
@@ -153,9 +280,21 @@ class FileController extends GetxController {
         }
         // file是map
         for (var file in fileList) {
-          File fileObj = File.fromMap(file);
+          FileObj fileObj = FileObj.fromMap(file);
           fileObjs.add(fileObj);
         }
+        // 排序
+        fileObjs.sort(
+          (a, b) {
+            if (a.ext == 'folder' && b.ext != 'folder') {
+              return -1;
+            }
+            if (a.ext != 'folder' && b.ext == 'folder') {
+              return 1;
+            }
+            return a.name.compareTo(b.name);
+          },
+        );
       },
       params: params1,
       headers: headers,
@@ -276,6 +415,7 @@ class FileController extends GetxController {
         );
         break;
       case downloadCode:
+        // 在task_pop处理
         break;
       case shareCode:
         break;
@@ -286,8 +426,18 @@ class FileController extends GetxController {
   }
 
   // 上传下载
-  setUploadPath(String path) {
+  setUpload(String dir, String path) {
+    uploadDir = dir;
     uploadPath = path;
+  }
+
+  // 获取nameList
+  String getNameListAsPath() {
+    String res = "";
+    for (var name in nameList) {
+      res += "$name/";
+    }
+    return res;
   }
 
   // 重命名

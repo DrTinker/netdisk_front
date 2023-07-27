@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_learn/components/trans_list.dart';
 import 'package:flutter_learn/conf/const.dart';
 import 'package:flutter_learn/conf/navi.dart';
-import 'package:flutter_learn/controller/file_controller.dart';
 import 'package:flutter_learn/controller/trans_controller.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +17,7 @@ class TransPage extends GetView<TransController> {
   ];
   @override
   Widget build(BuildContext context) {
-    TransController tc = Get.find<TransController>();
+    TransController tc = Get.find<TransController>(tag: tcPerTag);
     print('trans page tc: ${tc.hashCode}');
 
     return DefaultTabController(
@@ -41,8 +40,8 @@ class TransPage extends GetView<TransController> {
           init: TransController(),
           builder: (controller) {
             List<Widget> contents = [
-              TransList(tc: controller, flag: uploadFlag),
-              TransList(tc: controller, flag: downloadFlag)
+              TransListWidget(tc: controller, flag: uploadFlag),
+              TransListWidget(tc: controller, flag: downloadFlag)
             ];
             return TabBarView(
               children: contents,

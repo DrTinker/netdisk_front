@@ -17,18 +17,21 @@ class TransObj {
   String ext = "";
   String hash = "";
   String localPath = ""; // 本地文件地址
+  String remotePath=""; // 用户空间中的路径
   String fileKey = ""; // 云端地址
   String parentId = ""; // 父节点file_uuid
   int totalSize = 0; // 文件总大小
   int curSize = 0; // 已上传大小
+  int startSize = 0; // 开始传输时的大小
   int startTime = 0;
+  String url = ""; // cos下载路径
   // 状态
-  bool running = false; // 新创建的trans对象均为暂停状态
+  // int status = transProcess;
+  int running = processWait; // 新创建的trans对象均为wait
   // 分块上传
   int chunkSize = 0;
   int chunkCount = 0;
   List<int> chunkList = []; // 已上传的分块列表
-  Stream<List<int>>? fileReadStream;
 
   static TransObj fromMap(Map trans) {
     String fullName = trans['Name'] + "." + trans['Ext'];
@@ -36,11 +39,14 @@ class TransObj {
     String local = trans['Local_Path'];
     int totalSize = trans['Size'];
     String parentId = trans['Parent_Uuid'];
-    TransObj obj = TransObj(fullName, ext, local, totalSize, parentId);
+    int status = trans['Status'];
+    TransObj obj = TransObj(fullName, ext, local, totalSize, parentId, status);
     obj.transID = trans['Uuid'];
     obj.fileUuid = trans['File_Uuid'];
     obj.hash = trans['Hash'];
     obj.curSize = trans['CurSize'];
+    obj.startSize = obj.curSize;
+    
     // 处理最后一个分片不满的情况
     if (obj.curSize > obj.totalSize) {
       obj.curSize = obj.totalSize;
@@ -54,11 +60,11 @@ class TransObj {
     return obj;
   }
 
-  TransObj(String fullName, String? ext, String? local, int totalSize,
-      String? parentId) {
+  TransObj(String fullName, String? ext, String? local, int? totalSize,
+      String? parentId, int status) {
     icon = 'assets/images/nodata.png';
     this.fullName = fullName;
-    ext = ext;
+    this.ext = ext!;
     if (iconMap.containsKey(ext)) {
       icon = iconMap[ext]!;
     }
@@ -72,9 +78,9 @@ class TransObj {
         parentId = store.getStorage(userStartDir);
       }
     }
-
+    // this.status = status;
     // 初始化时先置为0，到发请求时再计算
-    this.totalSize = totalSize;
+    this.totalSize = totalSize!;
   }
 }
 
