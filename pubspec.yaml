@@ -50,6 +50,7 @@ dependencies:
   better_player: ^0.0.83
   photo_view: ^0.14.0
   audioplayers: ^5.0.0
+  isolate: ^2.0.2
 
 dev_dependencies:
   flutter_test:
