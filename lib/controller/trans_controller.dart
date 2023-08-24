@@ -3,13 +3,15 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cheetah_netdesk/isolate/manager.dart';
+
 import '../models/file_model.dart';
-import 'package:flutter_learn/helper/md5.dart';
+import 'package:cheetah_netdesk/helper/md5.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/conf/url.dart';
-import 'package:flutter_learn/helper/net.dart';
-import 'package:flutter_learn/models/trans_model.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdesk/conf/url.dart';
+import 'package:cheetah_netdesk/helper/net.dart';
+import 'package:cheetah_netdesk/models/trans_model.dart';
 import 'package:get/get.dart';
 
 import '../components/toast.dart';
@@ -35,7 +37,10 @@ class TransController extends GetxController {
   // 用户登录
   String token = "";
 
-  // TODO 增加最大传输数量限制
+  // taskMap
+  Map<String, TransObj> taskMap = {};
+  // 文件加入任务列表按钮展示
+  bool showAddTask = false;
 
   @override
   void onInit() {
@@ -82,11 +87,38 @@ class TransController extends GetxController {
     downloadList.getTransList(false);
     downloadFailList.getTransList(false);
     downloadSuccessList.getTransList(false);
+    update();
+  }
+
+  // 刷新不在进行中的列表
+  getNullProcessTransList(int mod) async{
+    if (mod == downloadFlag) {
+      await downloadFailList.getTransList(false);
+      await downloadSuccessList.getTransList(false);
+    }
+    if (mod == uploadFlag) {
+      await uploadFailList.getTransList(false);
+      await uploadSuccessList.getTransList(false);
+    }
+    update();
   }
 
   // 翻页
   getMoreData(TransList objs) async {
     await objs.getMoreData();
+    update();
+  }
+
+  // 切换加入任务队列按钮
+  switchShowAddTask(bool value) {
+    showAddTask = value;
+    update();
+  }
+
+  // 清空任务队列
+  clearTaskMap() {
+    taskMap.clear();
+    showAddTask = false;
     update();
   }
 
@@ -111,7 +143,8 @@ class TransController extends GetxController {
     startTrans(uploadFlag, false, targets: targets);
   }
 
-  addToDownload(String parentId, String downloadPath, Map<String, FileObj> taskMap) async {
+  addToDownload(String parentId, String downloadPath,
+      Map<String, FileObj> taskMap) async {
     Set<TransObj> targets = {};
     for (var id in taskMap.keys) {
       FileObj? file = taskMap[id];
@@ -130,10 +163,6 @@ class TransController extends GetxController {
     update();
     startTrans(downloadFlag, false, targets: targets);
   }
-
-  // TODO 改造上传
-  // 1. 开启传输isolate，主线程只负责选择文件，加入相应队列，每个传输对象分为4中状态
-  // 2. 传输isolate中维护传输队列，每秒从主线程获取传输队列
 
   // 上传大文件
   uploadLargeFile(TransObj obj) async {
@@ -172,15 +201,18 @@ class TransController extends GetxController {
     }
   }
 
-  bool flag = true;
   // 初始化分块上传
   Future<bool> initUploadPart(TransObj trans) async {
+    bool flag = true;
     // 设置开始时间
     trans.startTime = DateTime.now().microsecondsSinceEpoch;
-    // 计算hash
+    trans.startSize = trans.curSize;
+    // 计算hash, isolate优化
     if (trans.hash == "") {
-      await getFileHashByPath(trans.localPath)
-          .then((value) => trans.hash = value);
+      trans.hash = await ISOManager.loadBalanceFuture<String, String>(
+          getFileHashByPath, trans.localPath);
+      // await getFileHashByPath(trans.localPath)
+      //     .then((value) => trans.hash = value);
     }
     // 查看文件是否存在
     File f = File(trans.localPath);
@@ -301,13 +333,15 @@ class TransController extends GetxController {
             body: body,
             // fileBytes: fileBytes,
             progress: (curSize, totalSize) {
+              if (trans.running != processRunning) {
+                return;
+              }
               trans.curSize = tmpSize;
               // 进入发生变化时更新界面
               trans.curSize += curSize;
-              // print('c: $c, 当前: ${trans.curSize}, 总计: $totalSize, cur: $curSize');
+              //print('c: $c, 当前: ${trans.curSize}, 总计: $totalSize, cur: $curSize');
               update();
             },
-            transform: JSONConvert.create(),
             error: (statusCode, error) {
               print(error);
               trans.running = processSuspend;
@@ -341,10 +375,9 @@ class TransController extends GetxController {
           // 设置进度为100
           trans.curSize = trans.totalSize;
           // 加入成功队列
-          bool flag = uploadList.transList.remove(trans);
+          bool flag = uploadList.removeTrans(trans);
           if (flag) {
-            uploadSuccessList.transList.add(trans);
-            //trans.status = transSuccess;
+            uploadSuccessList.addTrans(trans);
           }
           update();
           // 发送通知
@@ -376,12 +409,13 @@ class TransController extends GetxController {
 
   // 普通上传接口
   uploadFile(TransObj trans) async {
-    // TODO 查看原因 直接读取byte数组导致文件损坏
-    // 计算hash值，为了减少文件磁盘IO，hash值推迟到此时计算
-    // var fileBytes = await trans.fileReadStream!.first;
-    // file.hash = getFileHashByStream(fileBytes);
-    await getFileHashByPath(trans.localPath)
-        .then((value) => trans.hash = value);
+    // isolate优化hash计算
+    trans.hash = await ISOManager.loadBalanceFuture<String, String>(
+        getFileHashByPath, trans.localPath);
+    // await getFileHashByPath(trans.localPath)
+    //     .then((value) => trans.hash = value);
+    trans.startTime = DateTime.now().microsecondsSinceEpoch;
+    trans.startSize = trans.curSize;
     Map<String, dynamic> body = {
       'hash': trans.hash,
       'name': trans.fullName,
@@ -397,10 +431,11 @@ class TransController extends GetxController {
         if (code == quickUploadCode || code == httpSuccessCode) {
           // 设置进度为100
           trans.curSize = trans.totalSize;
+          trans.transID = data['upload_id'];
           // 加入成功队列
-          bool flag = uploadList.transList.remove(trans);
+          bool flag = uploadList.removeTrans(trans);
           if (flag) {
-            uploadSuccessList.transList.add(trans);
+            uploadSuccessList.addTrans(trans);
             // trans.status = transSuccess;
           }
           update();
@@ -422,10 +457,11 @@ class TransController extends GetxController {
       // fileBytes: fileBytes,
       progress: (curSize, totalSize) {
         // 进入发生变化时更新界面
-        trans.curSize = curSize;
-        update();
+        if (trans.running == processRunning) {
+          trans.curSize = curSize;
+          update();
+        }
       },
-      transform: JSONConvert.create(),
       error: (statusCode, error) {
         MsgToast().serverErrToast();
         return;
@@ -438,6 +474,7 @@ class TransController extends GetxController {
   Future<bool> initDownloadPart(TransObj trans) async {
     // 设置开始时间
     trans.startTime = DateTime.now().microsecondsSinceEpoch;
+    trans.startSize = trans.curSize;
     Map<String, String> headers = {
       'Authorization': token,
     };
@@ -551,6 +588,9 @@ class TransController extends GetxController {
         partPath, // fileBytes: fileBytes,
         range: 'bytes=$start-${end == 0 ? "" : end}',
         progress: (curSize, totalSize) {
+          if (trans.running != processRunning) {
+            return;
+          }
           trans.curSize = tmpSize;
           // 进入发生变化时更新界面
           trans.curSize += curSize;
@@ -628,10 +668,9 @@ class TransController extends GetxController {
           // 设置进度为100
           trans.curSize = trans.totalSize;
           // 加入成功队列
-          bool flag = downloadList.transList.remove(trans);
+          bool flag = downloadList.removeTrans(trans);
           if (flag) {
-            downloadSuccessList.transList.add(trans);
-            //trans.status = transSuccess;
+            downloadSuccessList.addTrans(trans);
           }
           update();
           // 发送通知
@@ -652,6 +691,8 @@ class TransController extends GetxController {
 
   // 云存储直接下载
   downloadFile(TransObj trans) async {
+    trans.startTime = DateTime.now().microsecondsSinceEpoch;
+    trans.startSize = trans.curSize;
     Map<String, String> param = {
       "file_uuid": trans.fileUuid,
       'local_path': trans.localPath,
@@ -670,6 +711,7 @@ class TransController extends GetxController {
         if (code == httpSuccessCode) {
           // 获取预签名
           sign = data['file_token'];
+          trans.transID = data['download_id'];
           return;
         }
         // 发生错误
@@ -688,13 +730,16 @@ class TransController extends GetxController {
       sign,
       (data) {
         // 加入成功队列
-        bool flag = downloadList.transList.remove(trans);
+        bool flag = downloadList.removeTrans(trans);
         if (flag) {
-          downloadSuccessList.transList.add(trans);
+          downloadSuccessList.addTrans(trans);
         }
       },
       trans.localPath,
       progress: (curSize, totalSize) {
+        if (trans.running != processRunning) {
+          return;
+        }
         // 进入发生变化时更新界面
         trans.curSize = curSize;
         update();
@@ -706,10 +751,22 @@ class TransController extends GetxController {
   }
 
   // 删除记录
-  delTransRecord(TransObj obj) async{
-    String dir = await getPartDir(obj.hash, obj.remotePath);
-    // 删除本地临时目录
-    delDir(dir);
+  delTransRecord(TransObj obj, int mod, int status) async {
+    String url = "";
+    if (status == transProcess) {
+      if (mod == downloadFlag) {
+        String dir = await getPartDir(obj.hash, obj.remotePath);
+        // 删除本地临时目录
+        delDir(dir);
+        url = downloadCancelUrl;
+      }
+      if (mod == uploadFlag) {
+        url = uploadCancelUrl;
+      }
+    } else {
+      url = transDelUrl;
+    }
+
     Map<String, String> headers = {
       'Authorization': token,
     };
@@ -718,7 +775,7 @@ class TransController extends GetxController {
     };
 
     NetWorkHelper.requestPost(
-      transDelUrl,
+      url,
       (data) {
         int code = data['code'];
         if (code != httpSuccessCode) {
@@ -734,28 +791,103 @@ class TransController extends GetxController {
     );
   }
 
+  // 批量删除, 调用时记得清空taskMap
+  delTransBatch(int mod) async {
+    Map<String, String> headers = {
+      'Authorization': token,
+      'Content-Type': 'application/json',
+    };
+    List<String> srcIDList = [];
+    taskMap.forEach((key, value) {
+      // 在前端操作删除
+      srcIDList.add(key);
+    });
+    Map<String, dynamic> body = {
+      'Src': srcIDList,
+    };
+
+    await NetWorkHelper.requestPost(
+      transDelBatchUrl,
+      (data) {
+        int code = data['code'];
+        if (code != httpSuccessCode) {
+          print('$data');
+        }
+        taskMap.forEach((key, value) {
+          // 在前端删除
+          if (mod == uploadFlag) {
+            uploadSuccessList.removeTrans(value);
+            uploadFailList.removeTrans(value);
+          }
+          if (mod == downloadFlag) {
+            downloadFailList.removeTrans(value);
+            downloadSuccessList.removeTrans(value);
+          }
+        });
+      },
+      body: body,
+      headers: headers,
+      transform: JSONConvert.create(),
+      error: (statusCode, error) {
+        print(error.toString());
+      },
+    );
+  }
+
+  // 一键清空
+  clearTransList(int mod, int status) async {
+    Map<String, String> headers = {
+      'Authorization': token,
+    };
+    Map<String, dynamic> body = {'isdown': mod.toString(), 'status': status.toString()};
+
+    await NetWorkHelper.requestPost(
+      transClearUrl,
+      (data) {
+        int code = data['code'];
+        if (code != httpSuccessCode) {
+          print('$data');
+        }
+      },
+      body: body,
+      headers: headers,
+      transform: JSONConvert.create(),
+      error: (statusCode, error) {
+        print(error.toString());
+      },
+    );
+    getNullProcessTransList(mod);
+  }
+
   // 滑动删除
-  slideToDelTrans(List<TransObj> objList, int index) {
+  slideToDelTrans(List<TransObj> objList, int index, int mod, int status) {
     TransObj obj = objList[index];
     // 先更改状态为finfish
     obj.running = processFinish;
     objList.removeAt(index);
-    delTransRecord(obj);
+    delTransRecord(obj, mod, status);
     update();
   }
 
   // 暂停、继续和失败重传
   processHandler(TransObj obj, int mod, int status) {
-    // print('runnintg: ${obj.running}, mod: $mod, status: $status');
+    TransList src, des;
+    if (mod == uploadFlag) {
+      src = uploadFailList;
+      des = uploadList;
+    } else {
+      src = downloadFailList;
+      des = downloadList;
+    }
     // fail状态
     if (status == transFail) {
       // 加入上传队列
-      bool flag = uploadFailList.transList.remove(obj);
+      bool flag = src.transList.remove(obj);
       if (flag) {
         obj.running = processWait;
-        uploadList.transList.add(obj);
+        des.transList.add(obj);
         // 删除trans记录
-        delTransRecord(obj);
+        delTransRecord(obj, mod, status);
         // 重置transID
         obj.transID = "";
         // 异步开启传输

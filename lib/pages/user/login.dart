@@ -1,28 +1,20 @@
 // ignore_for_file: library_private_types_in_public_api, deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/conf/code.dart';
-import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/conf/url.dart';
-import 'package:flutter_learn/helper/net.dart';
-import 'package:flutter_learn/helper/storage.dart';
-import 'package:flutter_learn/components/toast.dart';
+
+import 'package:cheetah_netdesk/controller/user_controller.dart';
+import 'package:cheetah_netdesk/helper/parse.dart';
+
 import 'package:get/get.dart';
-import '../../helper/convert.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key, required this.title}) : super(key: key);
-  final String title;
+import '../../components/toast.dart';
 
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
+// ignore: must_be_immutable
+class LoginPage extends GetView<UserController> {
   final GlobalKey _formKey = GlobalKey<FormState>();
-  late String _email, _password;
-  bool _isObscure = true;
-  Color _eyeColor = Colors.grey;
+  String? _email, _password;
+  final _isObscure = true.obs;
+  final _eyeColor = Colors.grey.obs;
   final List _loginMethod = [
     {
       "title": "facebook",
@@ -37,33 +29,61 @@ class _LoginPageState extends State<LoginPage> {
       "icon": Icons.account_balance,
     },
   ];
+  // 检测退出逻辑
+  DateTime lastPopTime = DateTime.now();
+
+  LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Form(
-        key: _formKey, // 设置globalKey，用于后面获取FormStat
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          children: [
-            const SizedBox(height: kToolbarHeight), // 距离顶部一个工具栏的高度
-            buildTitle(), // Login
-            buildTitleLine(), // Login下面的下划线
-            const SizedBox(height: 60),
-            buildEmailTextField(), // 输入邮箱
-            const SizedBox(height: 30),
-            buildPasswordTextField(context), // 输入密码
-            buildForgetPasswordText(context), // 忘记密码
-            const SizedBox(height: 60),
-            buildLoginButton(context), // 登录按钮
-            const SizedBox(height: 40),
-            buildOtherLoginText(), // 其他账号登录
-            buildOtherMethod(context), // 其他登录方式
-            buildRegisterText(context), // 注册
-          ],
+    // // 读取controller
+    // UserController uc = Get.find<UserController>();
+    // 获取参数
+    Map<String, dynamic> data = Get.parameters;
+    if (data.containsKey('email')) {
+      _email = data['email'];
+    }
+    if (data.containsKey('password')) {
+      _password = data['password'];
+    }
+    return WillPopScope(
+      child: Scaffold(
+        body: Form(
+          key: _formKey, // 设置globalKey，用于后面获取FormStat
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            children: [
+              const SizedBox(height: kToolbarHeight), // 距离顶部一个工具栏的高度
+              buildTitle(), // Login
+              buildTitleLine(), // Login下面的下划线
+              const SizedBox(height: 60),
+              buildEmailTextField(), // 输入邮箱
+              const SizedBox(height: 30),
+              buildPasswordTextField(context), // 输入密码
+              buildForgetPasswordText(context), // 忘记密码
+              const SizedBox(height: 60),
+              buildLoginButton(context), // 登录按钮
+              const SizedBox(height: 40),
+              // buildOtherLoginText(), // 其他账号登录
+              // buildOtherMethod(context), // 其他登录方式
+              buildRegisterText(context), // 注册
+            ],
+          ),
         ),
       ),
+      onWillPop: () async {
+        // 根目录执行退出app逻辑
+        if (DateTime.now().difference(lastPopTime) > Duration(seconds: 1)) {
+          lastPopTime = DateTime.now();
+          MsgToast().customeToast("再按一次退出");
+          return Future.value(false);
+        } else {
+          lastPopTime = DateTime.now();
+          // 退出app
+          return Future.value(true);
+        }
+      },
     );
   }
 
@@ -132,39 +152,12 @@ class _LoginPageState extends State<LoginPage> {
                   side: BorderSide(style: BorderStyle.none)))),
           child:
               Text('登录', style: Theme.of(context).primaryTextTheme.headline5),
-          onPressed: () {
+          onPressed: () async{
             // 表单校验通过才会继续执行
             if ((_formKey.currentState as FormState).validate()) {
               (_formKey.currentState as FormState).save();
               // 请求登录接口
-              var url = loginUrl;
-              Map<String, String> params = {
-                'user_email': _email,
-                'user_pwd': _password
-              };
-              NetWorkHelper.requestGet(
-                  url,
-                  // success
-                  (data) {
-                    // var ps = PersistentStorage();
-                    var store = SyncStorage();
-                    if (data['code'] == loginErrCode) {
-                      MsgToast().customeToast("邮箱或密码错误");
-                      return;
-                    }
-                    // 写入token，和用户信息
-                    store.setStorage(userToken, data['token']);
-                    store.setStorage(userInfo, data['data']);
-                    String dir = data['data']['Start_Uuid'];
-                    store.setStorage(userStartDir, dir);
-                    // 跳转主页
-                    Get.offAllNamed('/file');
-                  },
-                  params: params,
-                  transform: JSONConvert.create(),
-                  error: (code, error) {
-                    MsgToast().serverErrToast();
-                  });
+              await UserController.doLogin(_email!, _password);
             }
           },
         ),
@@ -189,37 +182,39 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget buildPasswordTextField(BuildContext context) {
-    return TextFormField(
-        obscureText: _isObscure, // 是否显示文字
-        onSaved: (v) => _password = v!,
-        validator: (v) {
-          if (v!.isEmpty) {
-            return '请输入密码';
-          }
-          return null;
-        },
-        decoration: InputDecoration(
-            labelText: "Password",
-            suffixIcon: IconButton(
-              icon: Icon(
-                Icons.remove_red_eye,
-                color: _eyeColor,
-              ),
-              onPressed: () {
-                // 修改 state 内部变量, 且需要界面内容更新, 需要使用 setState()
-                setState(() {
-                  _isObscure = !_isObscure;
-                  _eyeColor = (_isObscure
-                      ? Colors.grey
-                      : Theme.of(context).iconTheme.color)!;
-                });
-              },
-            )));
+    return Obx(() {
+      return TextFormField(
+          obscureText: _isObscure.value, // 是否显示文字
+          onSaved: (v) => _password = v!,
+          validator: (v) {
+            if (v!.isEmpty) {
+              return '请输入密码';
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+              labelText: "密码",
+              hintText: _password,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  Icons.remove_red_eye,
+                  color: _eyeColor.value,
+                ),
+                onPressed: () {
+                  // 修改 state 内部变量, 且需要界面内容更新, 需要使用 setState()
+                  _isObscure.value = !_isObscure.value;
+                  _eyeColor.value = (_isObscure.value
+                      ? createMaterialColor(Colors.grey)
+                      : createMaterialColor(
+                          Theme.of(context).iconTheme.color!));
+                },
+              )));
+    });
   }
 
   Widget buildEmailTextField() {
     return TextFormField(
-      decoration: const InputDecoration(labelText: 'Email Address'),
+      decoration: InputDecoration(labelText: '邮箱', hintText: _email),
       validator: (v) {
         var emailReg = RegExp(
             r"[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?");

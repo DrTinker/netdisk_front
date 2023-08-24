@@ -1,24 +1,28 @@
 // ignore_for_file: must_be_immutable, no_logic_in_create_state, constant_pattern_never_matches_value_type
 
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/components/reaname_pop.dart';
-import 'package:flutter_learn/components/select_pop.dart';
-import 'package:flutter_learn/components/toast.dart';
-import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/controller/file_controller.dart';
-import 'package:flutter_learn/controller/trans_controller.dart';
+import 'package:cheetah_netdesk/components/rename_pop.dart';
+import 'package:cheetah_netdesk/components/select_pop.dart';
+import 'package:cheetah_netdesk/components/share_pop.dart';
+import 'package:cheetah_netdesk/components/toast.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdesk/controller/file_controller.dart';
+import 'package:cheetah_netdesk/controller/trans_controller.dart';
+import 'package:cheetah_netdesk/models/share_model.dart';
 import 'package:get/get.dart';
 
-class TaskPopContent extends StatefulWidget {
-  TaskPopContent({super.key, required this.fc, required this.tc});
+import '../models/file_model.dart';
+
+class FileTaskPopContent extends StatefulWidget {
+  FileTaskPopContent({super.key, required this.fc, required this.tc});
   FileController fc;
   TransController tc;
   @override
-  State<TaskPopContent> createState() => _TaskPopContentState(fc: fc, tc: tc);
+  State<FileTaskPopContent> createState() => _FileTaskPopContentState(fc: fc, tc: tc);
 }
 
-class _TaskPopContentState extends State<TaskPopContent> {
-  _TaskPopContentState({required this.fc, required this.tc});
+class _FileTaskPopContentState extends State<FileTaskPopContent> {
+  _FileTaskPopContentState({required this.fc, required this.tc});
   FileController fc;
   TransController tc;
 
@@ -28,11 +32,22 @@ class _TaskPopContentState extends State<TaskPopContent> {
       ListTile(title: Text('共选择${fc.taskMap.length}个文件'),)
     );
     int len = taskTypeList.length;
-    // 超过一个不许重命名
+    // 超过一个不许重命名和分享
     if (fc.taskMap.length>1) {
-      len --;
+      len -= 2;
     }
+    // 包含文件夹不能下载
+    bool flag = false;
+    fc.taskMap.forEach((key, value) {
+      if (value.ext == 'folder') {
+        flag = true;
+      }
+    });
     for (var i = 0; i < len; i++) {
+      // 包含文件夹跳过下载按钮渲染
+      if (flag && i==3) {
+        continue;
+      }
       list.add(ListTile(
         leading: taskIconList[i],
         title: Text(taskTypeList[i]),
@@ -71,7 +86,25 @@ class _TaskPopContentState extends State<TaskPopContent> {
           Get.back();
         };
       case shareCode:
-        return (){};
+        return () async{
+          Get.back();
+          // 获取file
+          FileObj? file;
+          if (fc.taskMap.isEmpty) {
+            MsgToast().serverErrToast();
+            return;
+          }
+          // 只有一个
+          fc.taskMap.forEach((key, value) {
+            file = value;
+          },);
+          // 创建Share
+          String fullName = '${file!.name}.${file!.ext}';
+          ShareObj share = ShareObj(file!.userUuid, file!.uuid, fullName);
+          SharePop().showPop(share, fc.token);
+          // 清理task
+          fc.clearTaskMap();
+        };
       case renameCode:
         return (){
           Get.back();
@@ -91,13 +124,13 @@ class _TaskPopContentState extends State<TaskPopContent> {
   }
 }
 
-class TaskPop {
+class FileTaskPop {
   showPop(FileController fc, TransController tc) {
     Get.bottomSheet(
       Container(
         height: 500,
         color: Colors.white,
-        child: TaskPopContent(fc: fc, tc: tc,),
+        child: FileTaskPopContent(fc: fc, tc: tc,),
       ),
       backgroundColor: Colors.white,
     );

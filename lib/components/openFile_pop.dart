@@ -1,17 +1,16 @@
 // ignore_for_file: must_be_immutable
-import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/components/select_pop.dart';
-import 'package:flutter_learn/components/toast.dart';
-import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/conf/file.dart';
-import 'package:flutter_learn/controller/file_controller.dart';
-import 'package:flutter_learn/controller/trans_controller.dart';
+import 'package:cheetah_netdesk/components/select_pop.dart';
+import 'package:cheetah_netdesk/components/toast.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdesk/conf/file.dart';
+import 'package:cheetah_netdesk/controller/file_controller.dart';
+import 'package:cheetah_netdesk/controller/trans_controller.dart';
+import 'package:cheetah_netdesk/controller/user_controller.dart';
 import 'package:get/get.dart';
 
-import '../models/trans_model.dart';
 
 class OpenFilePopContent extends StatefulWidget {
   OpenFilePopContent({super.key, required this.tc, required this.fc});
@@ -23,7 +22,6 @@ class OpenFilePopContent extends StatefulWidget {
       _OpenFilePopContentState(tc: tc, fc: fc);
 }
 
-// TODO 大文件读取优化
 class _OpenFilePopContentState extends State<OpenFilePopContent> {
   _OpenFilePopContentState({required this.tc, required this.fc});
   TransController tc;
@@ -31,14 +29,14 @@ class _OpenFilePopContentState extends State<OpenFilePopContent> {
 
   List<PlatformFile> files = [];
   Map content1 = {
-    '图片': Image.asset('assets/images/photo2.png'),
-    '视频': Image.asset('assets/images/video.png'),
-    '音频': Image.asset('assets/images/music.png'),
+    '图片': Image.asset('assets/icons/pic.png', width: 30, height: 30,),
+    '视频': Image.asset('assets/icons/video.png', width: 30, height: 30,),
+    '音频': Image.asset('assets/icons/music.png', width: 30, height: 30,),
   };
   Map content2 = {
-    '压缩包': Image.asset('assets/images/photo2.png'),
-    '文档': Image.asset('assets/images/video.png'),
-    '其他': Image.asset('assets/images/music.png'),
+    '压缩包': Image.asset('assets/icons/zip.png', width: 30, height: 30),
+    '文档': Image.asset('assets/icons/txt.png', width: 30, height: 30),
+    '其他': Image.asset('assets/icons/nodata.png', width: 30, height: 30),
   };
 
   List<Widget> _getButtons(Map content) {
@@ -47,15 +45,15 @@ class _OpenFilePopContentState extends State<OpenFilePopContent> {
       list.add(Column(
         children: [
           IconButton(
-              iconSize: 80,
+              iconSize: 60,
               onPressed: () {
                 openFilesHandler(key);
               },
               icon: value),
           SizedBox(
-            width: 30,
-            height: 30,
-            child: Text('$key'),
+            width: 60,
+            height: 20,
+            child: Center(child: Text('$key'),),
           )
         ],
       ));
@@ -107,6 +105,10 @@ class _OpenFilePopContentState extends State<OpenFilePopContent> {
           withReadStream: true,
         );
       }
+      if (result == null) {
+        print('用户未选择文件');
+        return;
+      }
       files = result!.files;
     } catch (e) {
       MsgToast().customeToast('文件选择出现错误，可能是选择了不支持类型的文件');
@@ -118,11 +120,14 @@ class _OpenFilePopContentState extends State<OpenFilePopContent> {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: _getButtons(content1),
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: _getButtons(content2),
         ),
+        Spacer(),
         ListTile(
           leading: Image.asset(
             'assets/images/folder4.png',
@@ -150,6 +155,7 @@ class _OpenFilePopContentState extends State<OpenFilePopContent> {
               },
               child: const Text('上传')),
         ),
+        SizedBox(height: 20,)
       ],
     );
   }
@@ -159,7 +165,7 @@ class OpenFilePop {
   showPop(TransController tc) {
     Get.bottomSheet(
       Container(
-        height: 320,
+        height: 300,
         color: Colors.white,
         child: OpenFilePopContent(
           fc: FileController(),

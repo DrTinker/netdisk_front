@@ -4,10 +4,9 @@ import 'dart:io';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 
-import 'package:flutter_learn/conf/const.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
 import 'package:http/http.dart';
 
-// TODO 优化只读取一遍文件
 // 通过路径读取，用于大文件
 Future<String> getFileHashByPath(String filePath) async {
   final file = File(filePath);

@@ -1,10 +1,10 @@
 // ignore_for_file: must_be_immutable, no_logic_in_create_state
 
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/components/file_tree.dart';
-import 'package:flutter_learn/components/mkdir_pop.dart';
-import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/helper/convert.dart';
+import 'package:cheetah_netdesk/components/file_tree.dart';
+import 'package:cheetah_netdesk/components/mkdir_pop.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdesk/helper/convert.dart';
 import 'package:get/get.dart';
 
 import '../controller/file_controller.dart';
@@ -81,6 +81,8 @@ class _SelectPopContentState extends State<SelectPopContent> {
                   side: BorderSide(style: BorderStyle.none)))),
           child: Text('至此路径下'),
           onPressed: () async{
+            // 关闭弹出层
+            Get.back();
             // dotask一定要在clear前完成
             // 执行任务
             if (index==uploadCode) {
@@ -91,8 +93,7 @@ class _SelectPopContentState extends State<SelectPopContent> {
             }
             // 清空外层taskMap
             outerFC.clearTaskMap();
-            // 关闭弹出层
-            Get.back();
+            
           },
         ),
       )

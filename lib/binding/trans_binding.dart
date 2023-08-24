@@ -1,5 +1,5 @@
 
-import 'package:flutter_learn/controller/trans_controller.dart';
+import 'package:cheetah_netdesk/controller/trans_controller.dart';
 import 'package:get/get.dart';
 
 import '../conf/const.dart';

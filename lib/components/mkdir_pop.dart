@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/controller/file_controller.dart';
+import 'package:cheetah_netdesk/controller/file_controller.dart';
 import 'package:get/get.dart';
 
 class MkdirPopContent extends StatefulWidget {
@@ -32,10 +32,9 @@ class _MkdirPopContentState extends State<MkdirPopContent> {
           buildNameTextField(),
           const SizedBox(height: 20),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               buildConfirmButton(),
-              const SizedBox(width: 40),
               buildCancelButton(),
             ],
           )

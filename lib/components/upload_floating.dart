@@ -1,6 +1,7 @@
 // ignore_for_file: no_logic_in_create_state
 
 import 'package:flutter/material.dart';
+import 'package:cheetah_netdesk/controller/user_controller.dart';
 
 import '../controller/trans_controller.dart';
 import 'openFile_pop.dart';
@@ -16,6 +17,7 @@ class UploadFloating extends StatefulWidget {
 class _UploadFloatingState extends State<UploadFloating> {
   _UploadFloatingState({required this.tc});
   TransController tc;
+
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(

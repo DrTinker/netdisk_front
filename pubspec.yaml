@@ -1,5 +1,5 @@
-name: flutter_learn
-description: A new Flutter project.
+name: cheetah_netdesk
+description: 不限速无审核的网盘系统.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -51,6 +51,10 @@ dependencies:
   photo_view: ^0.14.0
   audioplayers: ^5.0.0
   isolate: ^2.0.2
+  percent_indicator: ^4.2.3
+  restart_app: ^1.2.1
+  device_info_plus: ^8.0.0
+
 
 dev_dependencies:
   flutter_test:

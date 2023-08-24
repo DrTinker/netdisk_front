@@ -1,9 +1,10 @@
 // ignore_for_file: no_logic_in_create_state, must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/components/file_box.dart';
-import 'package:flutter_learn/controller/file_controller.dart';
-import 'package:flutter_learn/models/file_model.dart';
+import 'package:cheetah_netdesk/components/file_box.dart';
+import 'package:cheetah_netdesk/components/nodata.dart';
+import 'package:cheetah_netdesk/controller/file_controller.dart';
+import 'package:cheetah_netdesk/models/file_model.dart';
 
 class FileTree extends StatefulWidget {
   FileTree(
@@ -49,6 +50,8 @@ class _FileTreeState extends State<FileTree> {
   // 渲染widget
   List<Widget> _getData() {
     List<Widget> list = [];
+    // 顶部空隙
+    list.add(SizedBox(height: 10,));
     for (var i = 0; i < fc.fileObjs.length; i++) {
       FileObj obj = fc.fileObjs[i];
       if (widget.exts!=null && widget.exts!.isNotEmpty && !widget.exts!.contains(obj.ext)) {
@@ -62,6 +65,12 @@ class _FileTreeState extends State<FileTree> {
         fc: fc,
       ));
     }
+    if (fc.fileObjs.isEmpty) {
+      list.add(const NoDataPage());
+      return list;
+    }
+    // 底部空隙
+    list.add(SizedBox(height: 20,));
     return list;
   }
 

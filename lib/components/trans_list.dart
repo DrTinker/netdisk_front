@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/components/toast.dart';
-import 'package:flutter_learn/components/trans_box.dart';
-import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/controller/trans_controller.dart';
-import 'package:flutter_learn/helper/file.dart';
+import 'package:cheetah_netdesk/components/toast.dart';
+import 'package:cheetah_netdesk/components/trans_box.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdesk/controller/trans_controller.dart';
+import 'package:cheetah_netdesk/helper/file.dart';
 
 import '../models/trans_model.dart';
 
@@ -81,6 +81,7 @@ class _TransListWidgetState extends State<TransListWidget> {
     _getData();
     return ListView(
       children: [
+        SizedBox(height: 20,),
         Row(
           // mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -88,18 +89,12 @@ class _TransListWidgetState extends State<TransListWidget> {
               width: 10,
             ),
             Text('正在进行, 共${process!.transList.length}个'),
-            const Spacer(),
-            TextButton(
-                onPressed: () {
-                  MsgToast().customeToast('按钮1');
-                  createDir('/data/user/0/com.example.flutter_learn/files/c300e2e6a6d54f5b338');
-                },
-                child: const Text('全部暂停')),
             const SizedBox(
               width: 10,
             ),
           ],
         ),
+        SizedBox(height: 10,),
         Column(
           children: processView,
         ),
@@ -110,17 +105,16 @@ class _TransListWidgetState extends State<TransListWidget> {
               width: 10,
             ),
             Text('失败任务, 共${fail!.transList.length}个'),
-            const Spacer(),
-            TextButton(
-                onPressed: () {
-                  MsgToast().customeToast('按钮2');
-                },
-                child: const Text('全部重新开始')),
+            Spacer(),
+            TextButton(onPressed: (){
+              tc.clearTransList(flag, transFail);
+            }, child: Text('清空')),
             const SizedBox(
               width: 10,
             ),
           ],
         ),
+        SizedBox(height: 10,),
         Column(
           children: failView,
         ),
@@ -131,8 +125,16 @@ class _TransListWidgetState extends State<TransListWidget> {
               width: 10,
             ),
             Text('已完成任务, 共${success!.transList.length}个'),
+            Spacer(),
+            TextButton(onPressed: (){
+              tc.clearTransList(flag, transSuccess);
+            }, child: Text('清空')),
+            const SizedBox(
+              width: 10,
+            ),
           ],
         ),
+        SizedBox(height: 10,),
         Column(
           children: successView,
         ),

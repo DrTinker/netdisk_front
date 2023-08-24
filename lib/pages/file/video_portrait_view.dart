@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/components/video_player.dart';
+import 'package:cheetah_netdesk/components/video_player.dart';
 import 'package:get/get.dart';
-
+import  'package:flutter/services.dart';
 import '../../controller/file_controller.dart';
 
 class VideoPortraitPage extends GetView<FileController> {
@@ -25,15 +25,21 @@ class VideoPortraitPage extends GetView<FileController> {
     // 获取播放链接
     Map<String, dynamic> data = Get.parameters;
     String playUrl = data['url'];
+    // 设置屏幕方向
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Column(
+      body: WillPopScope(child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          SizedBox(height: 30,),
           // 竖屏播放
           CustomVideoPlayer(playUrl, 1),
         ],
-      ),
+      ), onWillPop: () async {
+        Get.offNamed('/file');
+        return Future.value(true);
+      })
     );
   }
 }

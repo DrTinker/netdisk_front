@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_initializing_formals
 
-import 'package:flutter_learn/components/toast.dart';
-import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/helper/storage.dart';
+import 'package:flutter/material.dart';
+import 'package:cheetah_netdesk/components/toast.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdesk/helper/storage.dart';
 
+import '../conf/file.dart';
 import '../conf/url.dart';
 import '../helper/convert.dart';
 import '../helper/net.dart';
@@ -12,7 +14,7 @@ class TransObj {
   // 基本信息
   String transID = ""; // 传输uuid
   String fileUuid = ""; // 文件file_uuid
-  String icon = "";
+  Widget? icon;
   String fullName = "";
   String ext = "";
   String hash = "";
@@ -46,6 +48,7 @@ class TransObj {
     obj.hash = trans['Hash'];
     obj.curSize = trans['CurSize'];
     obj.startSize = obj.curSize;
+    obj.remotePath = trans['Remote_Path'];
     
     // 处理最后一个分片不满的情况
     if (obj.curSize > obj.totalSize) {
@@ -62,11 +65,11 @@ class TransObj {
 
   TransObj(String fullName, String? ext, String? local, int? totalSize,
       String? parentId, int status) {
-    icon = 'assets/images/nodata.png';
+    icon = Image.asset('assets/icons/nodata.png', width: standardPicSize, height: standardPicSize);
     this.fullName = fullName;
     this.ext = ext!;
     if (iconMap.containsKey(ext)) {
-      icon = iconMap[ext]!;
+      icon = Image.asset(iconMap[ext]!, width: standardPicSize, height: standardPicSize,);
     }
     localPath = local!;
     // 默认在根路径下
@@ -87,6 +90,7 @@ class TransObj {
 // TODO 优化为双向链表
 class TransList {
   List<TransObj> transList = [];
+  Set<String> _transSet = {};
   // 用于快速索引list中的对象，执行队列移动操作
   // Map<TransObj, int> indexMap = {};
   int page = 1;
@@ -97,6 +101,25 @@ class TransList {
   TransList(int mod, int status) {
     this.mod = mod;
     this.status = status;
+  }
+
+  clearList() {
+    transList.clear();
+    _transSet.clear();
+  }
+
+  addTrans(TransObj transObj) {
+    if (!_transSet.contains(transObj.transID)) {
+      transList.add(transObj);
+      _transSet.add(transObj.transID);
+    }
+  }
+
+  bool removeTrans(TransObj transObj) {
+    if (status == transProcess) {
+      return transList.remove(transObj);
+    }
+    return transList.remove(transObj) && _transSet.remove(transObj.transID);
   }
 
   // 读取传输列表
@@ -116,16 +139,15 @@ class TransList {
         var trans_list = data['trans_list'];
         // 刷新清空
         if (!append) {
-          transList.clear();
-          // indexMap.clear();
-          // 刷新则重置页码
+          clearList();
           page = 1;
         }
         for (int i = 0; i < trans_list.length; i++) {
           TransObj transObj = TransObj.fromMap(trans_list[i]);
-          transList.add(transObj);
-          // TODO 处理同一页重复请求错误
-          // indexMap[transObj] = i;
+          // 不存在才加入, 解决刷新数据冲突问题
+          if (!_transSet.contains(transObj.transID)) {
+            addTrans(transObj);
+          }
         }
       },
       params: params,
@@ -139,16 +161,14 @@ class TransList {
     if (page <= 0) {
       return;
     }
-    page++;
+    page = ((transList.length / defaultPageSize) + 1).toInt();
     print('getMoreData, page: $page');
     int preLen = transList.length;
     await getTransList(true);
     int curLen = transList.length;
     // 没有更多数据
-    if (curLen == preLen && page > 1) {
-      page--;
+    if (curLen == preLen) {
       MsgToast().customeToast('没有更多数据了');
-      print('page: $page');
     }
     return;
   }

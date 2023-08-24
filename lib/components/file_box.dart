@@ -1,8 +1,8 @@
 // ignore_for_file: no_logic_in_create_state, no_leading_underscores_for_local_identifiers, must_be_immutable
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/controller/file_controller.dart';
-import 'package:flutter_learn/models/file_model.dart';
-import 'package:flutter_learn/components/toast.dart';
+import 'package:cheetah_netdesk/controller/file_controller.dart';
+import 'package:cheetah_netdesk/models/file_model.dart';
+import 'package:cheetah_netdesk/components/toast.dart';
 
 import '../helper/parse.dart';
 
@@ -74,7 +74,7 @@ class _FileBoxState extends State<FileBox> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(obj.updatedAt),
-          Text(parseSize(obj.size)),
+          obj.ext == 'folder' ? SizedBox() : Text(parseSize(obj.size)),
         ],
       );
     }
@@ -85,6 +85,14 @@ class _FileBoxState extends State<FileBox> {
         return;
       }
       FileObj obj = fc.fileObjs[index];
+      // 如果是分享，则只允许触发文件夹的handler
+      if (fc.banRootRefresh) {
+        if (obj.ext=='folder') {
+          fc.enter(obj.uuid, obj.name);
+        }
+        return;
+      }
+      // 如果不是分享情况，则按后缀名处理
       switch (obj.ext) {
         case "folder":
           fc.enter(obj.uuid, obj.name);

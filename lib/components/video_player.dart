@@ -1,7 +1,7 @@
 import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_learn/conf/const.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
 import 'package:get/get.dart';
 
 import '../helper/file.dart';
@@ -59,7 +59,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
       looping: true,
       deviceOrientationsAfterFullScreen: [
         DeviceOrientation.portraitDown,
-        DeviceOrientation.portraitUp
+        DeviceOrientation.portraitUp,
       ],
       controlsConfiguration: _getControllConfig()
     );
@@ -108,7 +108,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
                   Icons.account_circle_rounded,
                   "竖屏播放",
                   () {
-                    Get.toNamed('/video_portrait',
+                    Get.offNamed('/video_portrait',
                         parameters: {'url': playUrl});
                   },
                 )

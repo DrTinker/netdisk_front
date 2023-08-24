@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/conf/const.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
 import 'package:get/get.dart';
 
 import '../../components/audio_player.dart';
@@ -21,6 +21,7 @@ class AudioPage extends GetView<FileController> {
       ),
       body: Column(
         children: [
+          SizedBox(height: 40,),
           CustomAudioPlayer(
             audios: fc.audioUrls, index: int.parse(index),
           )

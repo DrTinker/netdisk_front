@@ -1,13 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/components/bottom_bar.dart';
-import 'package:flutter_learn/components/file_tree.dart';
-import 'package:flutter_learn/components/mkdir_pop.dart';
-import 'package:flutter_learn/components/task_pop.dart';
-import 'package:flutter_learn/components/toast.dart';
-import 'package:flutter_learn/components/upload_floating.dart';
-import 'package:flutter_learn/controller/file_controller.dart';
+import 'package:cheetah_netdesk/components/bottom_bar.dart';
+import 'package:cheetah_netdesk/components/file_tree.dart';
+import 'package:cheetah_netdesk/components/mkdir_pop.dart';
+import 'package:cheetah_netdesk/components/file_task_pop.dart';
+import 'package:cheetah_netdesk/components/toast.dart';
+import 'package:cheetah_netdesk/components/upload_floating.dart';
+import 'package:cheetah_netdesk/controller/file_controller.dart';
 import 'package:get/get.dart';
 
 import '../../conf/const.dart';
@@ -56,7 +56,7 @@ class FilePage extends GetView<FileController> {
                   MsgToast().customeToast('请先选择要操作的文件');
                   return;
                 }
-                TaskPop().showPop(fc, tc);
+                FileTaskPop().showPop(fc, tc);
               },
               icon: Icon(Icons.keyboard_control)),
         ],
@@ -89,7 +89,7 @@ class FilePage extends GetView<FileController> {
             child: Scaffold(
               // 首页则无后退符号
               appBar: _getAppBar(controller),
-              floatingActionButton: UploadFloating(tc: tc,),
+              floatingActionButton: UploadFloating(tc: tc),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerDocked,
               body: FileTree(

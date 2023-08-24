@@ -16,30 +16,40 @@ class _BottomBarState extends State<BottomBar> {
   _BottomBarState({required this.index});
   int index;
   Widget _getBottomBar() {
-      var _list = List.generate(4, (i) {
+    var _list = List.generate(5, (i) {
+      if (i != 2) {
         return BottomNavigationBarItem(
           icon: tabImages[i][0],
           activeIcon: tabImages[i][1],
           label: tabLabels[i],
         );
-      });
-
-      return BottomNavigationBar(
-          currentIndex: index,
-          type: BottomNavigationBarType.fixed,
-          onTap: (index) => {Get.toNamed(tabRouters[index])},
-          items: [
-            _list[0],
-            _list[1],
-            BottomNavigationBarItem(
-              icon: Image.asset('assets/icons/share.png', height: 0, width: 0,),
-              label: '',
-            ),
-            _list[2],
-            _list[3],
-          ]
+      } else {
+        return const BottomNavigationBarItem(
+          icon: SizedBox(),
         );
-    }
+      }
+    });
+
+    return BottomNavigationBar(
+        currentIndex: index,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) => {Get.offNamed(tabRouters[index])},
+        items: [
+          _list[0],
+          _list[1],
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              'assets/icons/share.png',
+              height: 0,
+              width: 0,
+            ),
+            label: '',
+          ),
+          _list[3],
+          _list[4],
+        ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return _getBottomBar();

@@ -1,46 +1,37 @@
 // ignore_for_file: must_be_immutable, no_logic_in_create_state
 
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/controller/file_controller.dart';
-import 'package:flutter_learn/helper/parse.dart';
+import 'package:cheetah_netdesk/controller/user_controller.dart';
 import 'package:get/get.dart';
 
-class RenamePopContent extends StatefulWidget {
-  RenamePopContent({super.key, required this.fc, required this.id, required this.fullName});
-  FileController fc;
-  String id;
-  String fullName;
+class UpdatePopContent extends StatefulWidget {
+  UpdatePopContent({super.key, required this.uc});
+  UserController uc;
 
   @override
-  State<RenamePopContent> createState() => _RenamePopContentState(fc: fc, id: id, fullName: fullName);
+  State<UpdatePopContent> createState() => _UpdatePopContentState();
 }
 
-class _RenamePopContentState extends State<RenamePopContent> {
-  _RenamePopContentState({required this.fc, required this.id, required this.fullName});
-  FileController fc;
+class _UpdatePopContentState extends State<UpdatePopContent> {
+
   final GlobalKey _formKey = GlobalKey<FormState>();
   String _name = "";
-  String id;
-  String fullName;
+
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column(
         children: [
-          Image.asset(
-            'assets/images/folder.png',
-            height: 60,
-            width: 60,
-          ),
+          SizedBox(height: 10,),
+          widget.uc.user!.avatar,
           const SizedBox(height: 20),
           buildNameTextField(),
           const SizedBox(height: 20),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               buildConfirmButton(),
-              const SizedBox(height: 20),
               buildCancelButton(),
             ],
           )
@@ -50,20 +41,17 @@ class _RenamePopContentState extends State<RenamePopContent> {
   }
 
   Widget buildNameTextField() {
-    List<String> names = splitName(fullName);
-    String name = names[0];
-    String ext = names[1];
     return TextFormField(
       textAlign: TextAlign.center,
-      decoration: InputDecoration(hintText: name),
+      decoration: InputDecoration(hintText: widget.uc.user!.userName),
       validator: (value) {if (value==null) {return '文件名不能为空';}return null;},
       onSaved: (v) {
         if (v == "") {
           setState(() {
-            _name = fullName;
+            _name = widget.uc.user!.userName;
           });
         } else {
-          _name = '${v!}.$ext';
+          _name = v!;
         }
       },
     );
@@ -81,7 +69,7 @@ class _RenamePopContentState extends State<RenamePopContent> {
         if ((_formKey.currentState as FormState).validate()) {
           (_formKey.currentState as FormState).save();
         }
-        fc.rename(id, _name);
+        widget.uc.doRename(_name);
         Get.back();
       },
     );
@@ -101,20 +89,12 @@ class _RenamePopContentState extends State<RenamePopContent> {
   }
 }
 
-class RenamePop{
-  showPop(FileController fc) {
-    String fileID = ""; String fileName = "";
-    // 只有一个元素
-    fc.taskMap.forEach((key, value) {
-      fileID = key;
-      fileName = '${value.name}.${value.ext}';
-    });
+class UserUpdatePop{
+  showPop(UserController uc) {
     Get.defaultDialog(
-      title: '重命名',
-      content: RenamePopContent(
-        fc: fc,
-        id: fileID,
-        fullName: fileName,
+      title: '修改用户信息',
+      content: UpdatePopContent(
+        uc: uc,
       ),
       barrierDismissible: false,
     );

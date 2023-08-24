@@ -1,9 +1,9 @@
 // ignore_for_file: no_logic_in_create_state, must_be_immutable, prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/controller/trans_controller.dart';
-import 'package:flutter_learn/models/trans_model.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdesk/controller/trans_controller.dart';
+import 'package:cheetah_netdesk/models/trans_model.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 
@@ -35,6 +35,8 @@ class _TransBoxState extends State<TransBox> {
   int flag; // 上传下载标志
   int status; // 传输状态
   TransController tc;
+
+  bool _isSelect = false;
 
   List<TransObj> objList = [];
 
@@ -114,7 +116,7 @@ class _TransBoxState extends State<TransBox> {
     if (flag==downloadFlag) {
       return Text(obj.localPath);
     } 
-    return Text('${parseSize(obj.totalSize)} 上传至： ${obj.remotePath}');
+    return Text('${parseSize(obj.totalSize)}  上传至: ${obj.remotePath}');
   }
 
   Widget _buildFailSub() {
@@ -122,7 +124,7 @@ class _TransBoxState extends State<TransBox> {
     return Text(parseSize(obj.totalSize));
   }
 
-  Widget? _getTrailing() {
+  Widget? _buildNormalTrailing() {
     TransObj obj = objList[index];
     Widget? icon;
     if (status == transFail) {
@@ -143,22 +145,54 @@ class _TransBoxState extends State<TransBox> {
     return trail;
   }
 
-  successHandler() {
-    
+  Widget _buildSelectTrailing() {
+    TransObj obj = objList[index];
+      setState(() {
+        _isSelect = tc.taskMap.containsKey(obj.transID);
+      });
+      Widget trail = Checkbox(
+        value: _isSelect,
+        onChanged: (value) {
+          setState(() {
+            _isSelect = !_isSelect;
+          });
+          // 加入taskList
+          if (_isSelect) {
+            tc.taskMap[obj.transID] = obj;
+            print('taskMap: ${tc.taskMap}');
+          } else {
+            tc.taskMap.remove(obj.transID);
+            // 任务队列被清空时隐藏任务按钮
+            if (tc.taskMap.isEmpty) {
+              tc.switchShowAddTask(false);
+            }
+            print('taskMap: ${tc.taskMap}');
+          }
+        },
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        activeColor: Colors.blue,
+        checkColor: Colors.white,
+      );
+
+      return trail;
   }
 
   Widget _buildListTile() {
     return ListTile(
-      leading: Image.asset(
-        objList[index].icon,
-        height: 50,
-        width: 50,
-      ),
+      leading: objList[index].icon,
       title: _getTitle(),
       subtitle: _getSubTitle(),
-      trailing: _getTrailing(),
+      trailing: tc.showAddTask ? _buildSelectTrailing() : _buildNormalTrailing(),
       onTap: () {
         Get.snackbar("提示", "文件${objList[index].fullName}");
+      },
+      onLongPress: () {
+        // 成功和失败的允许选中进行删除
+        if (status == transSuccess || status == transFail) {
+          TransObj obj = objList[index];
+          tc.taskMap[obj.transID] = obj;
+          tc.switchShowAddTask(true);
+        }
       },
     );
   }
@@ -176,7 +210,7 @@ class _TransBoxState extends State<TransBox> {
             // An action can be bigger than the others.
             flex: 2,
             onPressed: (BuildContext ctx){
-              tc.slideToDelTrans(objList, index);
+              tc.slideToDelTrans(objList, index, flag, status);
             },
             backgroundColor: Color.fromARGB(255, 227, 64, 24),
             foregroundColor: Colors.white,

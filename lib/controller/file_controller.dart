@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/conf/file.dart';
-import 'package:flutter_learn/helper/file.dart';
-import 'package:flutter_learn/helper/parse.dart';
-import 'package:flutter_learn/helper/storage.dart';
+
+import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdesk/conf/file.dart';
+import 'package:cheetah_netdesk/helper/file.dart';
+import 'package:cheetah_netdesk/helper/parse.dart';
+import 'package:cheetah_netdesk/helper/storage.dart';
 import 'package:get/get.dart';
 import '../components/toast.dart';
 import '../conf/code.dart';
@@ -34,9 +34,11 @@ class FileController extends GetxController {
   Map<String, FileObj> imageUrls = {};
   // 音频
   Map<String, FileObj> audioUrls = {};
+  // 禁止根目录刷新，用于获取分享文件列表
+  bool banRootRefresh = false;
 
   @override
-  void onInit() {
+  void onInit() async{
     // 尝试读取token和根目录，读不到直接返回，说明没登录
     var store = SyncStorage();
     if (!store.hasKey(userToken) && !store.hasKey(userStartDir)) {
@@ -96,7 +98,8 @@ class FileController extends GetxController {
   }
 
   // 退出文件夹
-  back() {
+  // 传入uuid时，只会获取uuid对应一个文件的信息
+  back({String? uuid}) {
     // 至少有一层根目录
     if (dirList.length == 1 || nameList.length == 1) {
       return;
@@ -108,6 +111,11 @@ class FileController extends GetxController {
     // 清零page
     page = 1;
     print("nameList: $nameList, cur: $curDir, name: $curName, page: $page");
+    // 处理分享的情况
+    if (uuid != null) {
+      getFileInfo(uuid);
+      return;
+    }
     getFileObjs(false);
   }
 
@@ -249,8 +257,33 @@ class FileController extends GetxController {
   }
 
   // 网络请求
+  // 获取单个文件
+  getFileInfo(String uuid) async {
+    Map<String, String> params = {'file_uuid': uuid};
+    await NetWorkHelper.requestGet(
+        fileInfoUrl,
+        // success
+        (data) {
+          if (data['code'] == httpSuccessCode) {
+            fileObjs.clear();
+            fileObjs.add(FileObj.fromMap(data['info']));
+            update();
+            return;
+          }
+        },
+        headers: {'Authorization': token},
+        params: params,
+        transform: JSONConvert.create(),
+        error: (code, error) {
+          MsgToast().serverErrToast();
+        }
+    );
+  }
   // 获取路径下文件列表
   getFileObjs(bool append) async {
+    if (isRoot() && banRootRefresh) {
+      return;
+    }
     // token或curDir为空，说明还未初始化
     if (token == "" || curDir == "") {
       return;
@@ -262,7 +295,7 @@ class FileController extends GetxController {
       page = 1;
     }
     // 请求文件接口
-    String url = fileInfoUrl;
+    String url = fileListUrl;
     Map<String, String> headers = {
       'Authorization': token,
     };
@@ -414,11 +447,6 @@ class FileController extends GetxController {
           },
         );
         break;
-      case downloadCode:
-        // 在task_pop处理
-        break;
-      case shareCode:
-        break;
       default:
         MsgToast().customeToast('操作类型错误');
         return () {};
@@ -434,8 +462,13 @@ class FileController extends GetxController {
   // 获取nameList
   String getNameListAsPath() {
     String res = "";
-    for (var name in nameList) {
-      res += "$name/";
+    for (int i=0; i<nameList.length; i++) {
+      String name = nameList[i];
+      if (i==nameList.length-1) {
+        res += name;
+      } else {
+        res += "$name/";
+      }
     }
     return res;
   }
@@ -443,7 +476,7 @@ class FileController extends GetxController {
   // 重命名
   rename(String id, String fullname) async {
     await NetWorkHelper.requestPost(
-      renameUrl,
+      fileRenameUrl,
       (data) {
         MsgToast().customeToast('文件操作成功');
       },

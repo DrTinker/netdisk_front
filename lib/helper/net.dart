@@ -4,8 +4,12 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_learn/helper/convert.dart';
-import 'package:flutter_learn/models/trans_model.dart';
+import 'package:cheetah_netdesk/components/toast.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdesk/controller/user_controller.dart';
+import 'package:cheetah_netdesk/helper/convert.dart';
+import 'package:cheetah_netdesk/helper/storage.dart';
+import 'package:cheetah_netdesk/models/trans_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:developer' as developer;
 
@@ -81,10 +85,9 @@ class NetWorkHelper {
   }
 
   //dio 实现文件上传
-  static Future<dynamic> fileUplod(
+  static fileUplod(
       String url, String token, onSuccess success, TransObj file,
       {Map<String, dynamic>? body,
-      Convert? transform,
       onError? error,
       onProgress? progress}) async {
     ///创建Dio
@@ -116,7 +119,7 @@ class NetWorkHelper {
           onSendProgress: progress);
 
       ///服务器响应结果
-      checkDioResp(response, transform, success, error);
+      checkDioResp(response, success, error);
     } catch (e) {
       developer.log("package:net/network.dart error upload:$e");
       if (error != null) {
@@ -174,13 +177,17 @@ class NetWorkHelper {
       success(data);
     } else {
       developer.log('Request get failed with status: ${response.statusCode}');
+      // 未登录
+      if (response.statusCode == 401) {
+        refreshToken();
+      }
       if (error != null) {
         error(response.statusCode, response.body);
       }
     }
   }
 
-  static void checkDioResp(Response response, Convert? transform,
+  static void checkDioResp(Response response,
       onSuccess success, onError? error) {
     if (response.statusCode == 200) {
       dynamic data = response.data;
@@ -188,6 +195,11 @@ class NetWorkHelper {
       success(data);
     } else {
       developer.log('Request get failed with status: ${response.statusCode}');
+      // 未登录
+      if (response.statusCode == 401) {
+        refreshToken();
+      }
+      
       if (error != null) {
         error(response.statusCode!, "fail get data");
       }
@@ -203,9 +215,30 @@ class NetWorkHelper {
       success(data);
     } else {
       developer.log('Request get failed with status: ${response.statusCode}');
+      // 未登录
+      if (response.statusCode == 401) {
+        refreshToken();
+      }
       if (error != null) {
         error(response.statusCode!, "fail get data");
       }
+    }
+  }
+
+  static refreshToken() async{
+    // 读取磁盘的email和pwd
+    var ps = PersistentStorage();
+    String email = await ps.getStorage(userEmail);
+    String pwd = await ps.getStorage(userPwd);
+    // 请求登录接口
+    bool flag = await UserController.doLogin(email, pwd);
+    // 尝试10次
+    for (int i=0; i<10 && !flag; i++) {
+      flag = await UserController.doLogin(email, pwd, navi: false);
+    }
+    // 还没成功
+    if (!flag) {
+      MsgToast().customeToast('登录失效了，请尝试退出app重新登录');
     }
   }
 }

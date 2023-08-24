@@ -4,9 +4,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter_learn/components/toast.dart';
-import 'package:flutter_learn/conf/const.dart';
-import 'package:flutter_learn/models/file_model.dart';
+import 'package:cheetah_netdesk/components/toast.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdesk/models/file_model.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 
@@ -47,9 +47,9 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer>
   int playMode = audioCycle;
   String coverImgUrl = "";
   final List<Widget> modIcons = [
-    Icon(Icons.loop),
-    Icon(Icons.rocket),
-    Icon(Icons.rocket_launch)
+    Image.asset('assets/icons/all_circle.png'),
+    Image.asset('assets/icons/one_circle.png'),
+    Image.asset('assets/icons/random.png'),
   ];
 
   Duration? _duration;
@@ -441,12 +441,12 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer>
             onPressed: () {
               _prev();
             },
-            icon: Icon(Icons.keyboard_double_arrow_left)),
+            icon: Image.asset('assets/icons/prev.png'),),
         IconButton(
             icon: (_audioPlayer.state == PlayerState.paused ||
                     _audioPlayer.state == PlayerState.stopped)
-                ? const Icon(Icons.play_arrow)
-                : const Icon(Icons.pause),
+                ? Image.asset('assets/icons/pause.png')
+                : Image.asset('assets/icons/play.png'),
             onPressed: () {
               (_audioPlayer.state == PlayerState.paused ||
                       _audioPlayer.state == PlayerState.stopped)
@@ -457,12 +457,13 @@ class _CustomAudioPlayerState extends State<CustomAudioPlayer>
             onPressed: () {
               _next();
             },
-            icon: Icon(Icons.keyboard_double_arrow_right)),
+            icon: Image.asset('assets/icons/next.png'),
+        )
       ],
     );
     // 播放列表按钮
     Widget listIcon = IconButton(
-      icon: Icon(Icons.list),
+      icon: Image.asset('assets/icons/list.png'),
       onPressed: () {
         _getAudioListPop();
       },

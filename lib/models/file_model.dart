@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_learn/conf/const.dart';
+import 'package:cheetah_netdesk/conf/const.dart';
+
+import '../conf/file.dart';
 
 class FileObj {
   String uuid;
@@ -27,15 +29,16 @@ class FileObj {
 
   // 通过map构造
   static FileObj fromMap(Map file) {
-    Widget icon = Image.asset('assets/images/nodata.png');
+    Widget icon = Image.asset('assets/icons/nodata.png', width: standardPicSize, height: standardPicSize);
     if (file['Thumbnail'] != "") {
       icon = CachedNetworkImage(
+        width: standardPicSize, height: standardPicSize,
         imageUrl: file['Thumbnail'],
-        placeholder: (context, url) => Image.asset('assets/images/nodata.png'),
-        errorWidget: (context, url, error) => Image.asset('assets/images/nodata.png'),
+        placeholder: (context, url) => Image.asset('assets/icons/nodata.png', width: standardPicSize, height: standardPicSize),
+        errorWidget: (context, url, error) => Image.asset('assets/icons/nodata.png', width: standardPicSize, height: standardPicSize),
       );
     } else if (iconMap.containsKey(file['Ext'])) {
-      icon = Image.asset(iconMap[file['Ext']]!);
+      icon = Image.asset(iconMap[file['Ext']]!, width: standardPicSize, height: standardPicSize,);
     }
     return FileObj(
       uuid: file['Uuid']!,
