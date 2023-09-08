@@ -28,14 +28,14 @@ class UserObj {
     Widget icon = Image.asset('assets/random/qq.jpg', height: 60, width: 60,);
     Widget avatar = ClipOval(child: icon,);
     return UserObj(
-      userID: user['Uuid']!,
-      userName: user['Name']!,
-      email: user['Email']!,
-      phone: user['Phone']!,
-      level: user['Level']!,
-      startID: user['Start_Uuid'],
-      nowVolume: user['Now_Volume']!,
-      totalVolume: user['Total_Volume']!,
+      userID: user['userID']!,
+      userName: user['userName']!,
+      email: user['userEmail']!,
+      phone: user['userPhone']!,
+      level: user['level']!,
+      startID: user['startID'],
+      nowVolume: user['nowVolume']!,
+      totalVolume: user['totalVolume']!,
       avatar: avatar,
     );
   }
@@ -44,14 +44,14 @@ class UserObj {
     Widget icon = Image.asset('assets/random/qq.jpg', height: 60, width: 60,);
     Widget avatar = ClipOval(child: icon,);
     return UserObj(
-      userID: user['Uuid'] ?? "",
-      userName: user['Name']?? "",
-      email: user['Email']?? "",
-      phone: user['Phone']?? "",
-      level: user['Level']?? 0,
-      startID: user['Start_Uuid']?? "",
-      nowVolume: user['Now_Volume']?? 0,
-      totalVolume: user['Total_Volume']?? 0,
+      userID: user['userID'] ?? "",
+      userName: user['userName']?? "",
+      email: user['userEmail']?? "",
+      phone: user['userPhone']?? "",
+      level: user['level']?? 0,
+      startID: user['startID']?? "",
+      nowVolume: user['nowVolume']?? 0,
+      totalVolume: user['totalVolume']?? 0,
       avatar: avatar,
     );
   }

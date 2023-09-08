@@ -35,7 +35,7 @@ class UserController extends GetxController {
     bool res = true;
     // 请求登录接口
     var url = loginUrl;
-    Map<String, String> params = {'user_email': email, 'user_pwd': password};
+    Map<String, String> params = {'userEmail': email, 'userPwd': password};
     await NetWorkHelper.requestGet(
         url,
         // success
@@ -56,7 +56,7 @@ class UserController extends GetxController {
           var aa = await ps.getKeys();
           // 写入全局map，保存登录态
           var store = SyncStorage();
-          String dir = data['data']['Start_Uuid'];
+          String dir = data['data']['startID'];
           store.setStorage(userStartDir, dir);
           store.setStorage(userToken, data['token']);
           // 查看是否跳转页面
@@ -79,10 +79,10 @@ class UserController extends GetxController {
     // 请求登录接口
     var url = registerUrl;
     Map<String, String> body = {
-      'Name': userName,
-      'Password': password,
-      'Email': email,
-      'Phone': phone
+      'userName': userName,
+      'userPwd': password,
+      'userEmail': email,
+      'userPhone': phone
     };
     NetWorkHelper.requestPost(
         url,
@@ -115,7 +115,7 @@ class UserController extends GetxController {
   static sendCode(String email) async {
     // 邮件发送接口
     var url = sendCodeUrl;
-    Map<String, String> params = {'user_email': email};
+    Map<String, String> params = {'userEmail': email};
     NetWorkHelper.requestGet(
         url,
         // success
@@ -135,7 +135,7 @@ class UserController extends GetxController {
   static sendForget(String email, phone) async {
     // 邮件发送接口
     var url = sendForgetUrl;
-    Map<String, String> params = {'user_email': email, 'user_phone': phone};
+    Map<String, String> params = {'userEmail': email, 'userPhone': phone};
     NetWorkHelper.requestGet(
         url,
         // success
@@ -155,7 +155,7 @@ class UserController extends GetxController {
   doRename(String name) {
     // 改名接口
     var url = renameUrl;
-    Map<String, String> body = {'name': name};
+    Map<String, String> body = {'userName': name};
     NetWorkHelper.requestPost(
         url,
         // success
@@ -205,7 +205,7 @@ class UserController extends GetxController {
           }
         },
         headers: {'Authorization': token},
-        params: {'user_id': userID},
+        params: {'userID': userID},
         transform: JSONConvert.create(),
         error: (code, error) {
           MsgToast().serverErrToast();

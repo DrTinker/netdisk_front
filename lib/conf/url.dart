@@ -1,4 +1,4 @@
-const baseUrl = "http://114.115.219.182:8081";
+const baseUrl = "http://192.168.0.120:8081";
 
 const loginUrl = "$baseUrl/user/login";
 const userRenameUrl = "$baseUrl/user/rename";
