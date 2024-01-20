@@ -1,13 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/bottom_bar.dart';
-import 'package:cheetah_netdesk/components/file_tree.dart';
-import 'package:cheetah_netdesk/components/mkdir_pop.dart';
-import 'package:cheetah_netdesk/components/file_task_pop.dart';
-import 'package:cheetah_netdesk/components/toast.dart';
-import 'package:cheetah_netdesk/components/upload_floating.dart';
-import 'package:cheetah_netdesk/controller/file_controller.dart';
+import 'package:cheetah_netdisk/components/bottom_bar.dart';
+import 'package:cheetah_netdisk/components/file_tree.dart';
+import 'package:cheetah_netdisk/components/mkdir_pop.dart';
+import 'package:cheetah_netdisk/components/file_task_pop.dart';
+import 'package:cheetah_netdisk/components/toast.dart';
+import 'package:cheetah_netdisk/components/upload_floating.dart';
+import 'package:cheetah_netdisk/controller/file_controller.dart';
 import 'package:get/get.dart';
 
 import '../../conf/const.dart';

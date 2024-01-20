@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/card.dart';
-import 'package:cheetah_netdesk/components/select_pop.dart';
-import 'package:cheetah_netdesk/components/toast.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/controller/file_controller.dart';
-import 'package:cheetah_netdesk/controller/trans_controller.dart';
+import 'package:cheetah_netdisk/components/card.dart';
+import 'package:cheetah_netdisk/components/select_pop.dart';
+import 'package:cheetah_netdisk/components/toast.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/controller/file_controller.dart';
+import 'package:cheetah_netdisk/controller/trans_controller.dart';
 import 'package:get/get.dart';
 
 import '../../components/file_tree.dart';

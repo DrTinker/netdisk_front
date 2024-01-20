@@ -1,9 +1,9 @@
 // ignore_for_file: prefer_initializing_formals
 
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/toast.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/helper/storage.dart';
+import 'package:cheetah_netdisk/components/toast.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/helper/storage.dart';
 
 import '../conf/file.dart';
 import '../conf/url.dart';

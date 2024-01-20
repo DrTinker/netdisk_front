@@ -1,8 +1,8 @@
 import 'dart:isolate';
 
 import 'package:dio/dio.dart';
-import 'package:cheetah_netdesk/isolate/manager.dart';
-import 'package:cheetah_netdesk/models/trans_model.dart';
+import 'package:cheetah_netdisk/isolate/manager.dart';
+import 'package:cheetah_netdisk/models/trans_model.dart';
 import 'dart:developer' as developer;
 
 typedef onError = void Function(int statusCode, Object error);

@@ -1,9 +1,9 @@
 
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/conf/file.dart';
-import 'package:cheetah_netdesk/helper/file.dart';
-import 'package:cheetah_netdesk/helper/parse.dart';
-import 'package:cheetah_netdesk/helper/storage.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/conf/file.dart';
+import 'package:cheetah_netdisk/helper/file.dart';
+import 'package:cheetah_netdisk/helper/parse.dart';
+import 'package:cheetah_netdisk/helper/storage.dart';
 import 'package:get/get.dart';
 import '../components/toast.dart';
 import '../conf/code.dart';

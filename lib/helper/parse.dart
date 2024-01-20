@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
 
 List<String> splitName(String fullName) {
   List<String> res = [];

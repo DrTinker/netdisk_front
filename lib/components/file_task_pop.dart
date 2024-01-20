@@ -1,14 +1,14 @@
 // ignore_for_file: must_be_immutable, no_logic_in_create_state, constant_pattern_never_matches_value_type
 
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/rename_pop.dart';
-import 'package:cheetah_netdesk/components/select_pop.dart';
-import 'package:cheetah_netdesk/components/share_pop.dart';
-import 'package:cheetah_netdesk/components/toast.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/controller/file_controller.dart';
-import 'package:cheetah_netdesk/controller/trans_controller.dart';
-import 'package:cheetah_netdesk/models/share_model.dart';
+import 'package:cheetah_netdisk/components/rename_pop.dart';
+import 'package:cheetah_netdisk/components/select_pop.dart';
+import 'package:cheetah_netdisk/components/share_pop.dart';
+import 'package:cheetah_netdisk/components/toast.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/controller/file_controller.dart';
+import 'package:cheetah_netdisk/controller/trans_controller.dart';
+import 'package:cheetah_netdisk/models/share_model.dart';
 import 'package:get/get.dart';
 
 import '../models/file_model.dart';

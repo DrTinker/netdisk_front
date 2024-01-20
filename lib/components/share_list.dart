@@ -1,8 +1,8 @@
 // ignore_for_file: no_logic_in_create_state, must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/share_box.dart';
-import 'package:cheetah_netdesk/controller/share_controller.dart';
+import 'package:cheetah_netdisk/components/share_box.dart';
+import 'package:cheetah_netdisk/controller/share_controller.dart';
 import '../conf/const.dart';
 import '../models/share_model.dart';
 import 'nodata.dart';

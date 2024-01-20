@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cheetah.netdesk">
+    package="com.cheetah.netdisk">
     <application
         android:label="猎豹网盘"
         android:name="${applicationName}"

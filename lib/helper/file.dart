@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:cheetah_netdesk/conf/file.dart';
+import 'package:cheetah_netdisk/conf/file.dart';
 import 'package:get/get_connect/sockets/src/socket_notifier.dart';
 import 'package:path_provider/path_provider.dart';
 

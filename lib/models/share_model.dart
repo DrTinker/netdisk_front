@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/helper/parse.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/helper/parse.dart';
 
 import '../conf/file.dart';
 

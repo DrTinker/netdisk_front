@@ -3,15 +3,15 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:cheetah_netdesk/isolate/manager.dart';
+import 'package:cheetah_netdisk/isolate/manager.dart';
 
 import '../models/file_model.dart';
-import 'package:cheetah_netdesk/helper/md5.dart';
+import 'package:cheetah_netdisk/helper/md5.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/conf/url.dart';
-import 'package:cheetah_netdesk/helper/net.dart';
-import 'package:cheetah_netdesk/models/trans_model.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/conf/url.dart';
+import 'package:cheetah_netdisk/helper/net.dart';
+import 'package:cheetah_netdisk/models/trans_model.dart';
 import 'package:get/get.dart';
 
 import '../components/toast.dart';

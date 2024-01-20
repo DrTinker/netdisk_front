@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:cheetah_netdesk/components/share_pop.dart';
-import 'package:cheetah_netdesk/components/toast.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/controller/share_controller.dart';
-import 'package:cheetah_netdesk/models/share_model.dart';
+import 'package:cheetah_netdisk/components/share_pop.dart';
+import 'package:cheetah_netdisk/components/toast.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/controller/share_controller.dart';
+import 'package:cheetah_netdisk/models/share_model.dart';
 import 'package:get/get.dart';
 
 

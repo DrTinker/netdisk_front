@@ -4,12 +4,12 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:cheetah_netdesk/components/toast.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/controller/user_controller.dart';
-import 'package:cheetah_netdesk/helper/convert.dart';
-import 'package:cheetah_netdesk/helper/storage.dart';
-import 'package:cheetah_netdesk/models/trans_model.dart';
+import 'package:cheetah_netdisk/components/toast.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/controller/user_controller.dart';
+import 'package:cheetah_netdisk/helper/convert.dart';
+import 'package:cheetah_netdisk/helper/storage.dart';
+import 'package:cheetah_netdisk/models/trans_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:developer' as developer;
 

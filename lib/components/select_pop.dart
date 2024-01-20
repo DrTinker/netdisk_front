@@ -1,10 +1,10 @@
 // ignore_for_file: must_be_immutable, no_logic_in_create_state
 
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/file_tree.dart';
-import 'package:cheetah_netdesk/components/mkdir_pop.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/helper/convert.dart';
+import 'package:cheetah_netdisk/components/file_tree.dart';
+import 'package:cheetah_netdisk/components/mkdir_pop.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/helper/convert.dart';
 import 'package:get/get.dart';
 
 import '../controller/file_controller.dart';

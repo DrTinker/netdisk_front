@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/toast.dart';
-import 'package:cheetah_netdesk/components/trans_box.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/controller/trans_controller.dart';
-import 'package:cheetah_netdesk/helper/file.dart';
+import 'package:cheetah_netdisk/components/toast.dart';
+import 'package:cheetah_netdisk/components/trans_box.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/controller/trans_controller.dart';
+import 'package:cheetah_netdisk/helper/file.dart';
 
 import '../models/trans_model.dart';
 

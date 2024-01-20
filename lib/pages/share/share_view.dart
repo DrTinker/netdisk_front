@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/share_list.dart';
-import 'package:cheetah_netdesk/components/share_task_pop.dart';
-import 'package:cheetah_netdesk/controller/share_controller.dart';
+import 'package:cheetah_netdisk/components/share_list.dart';
+import 'package:cheetah_netdisk/components/share_task_pop.dart';
+import 'package:cheetah_netdisk/controller/share_controller.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
 

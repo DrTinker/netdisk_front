@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:cheetah_netdesk/components/card.dart';
-import 'package:cheetah_netdesk/models/share_model.dart';
+import 'package:cheetah_netdisk/components/card.dart';
+import 'package:cheetah_netdisk/models/share_model.dart';
 import 'package:get/get.dart';
 
 import '../../components/share_pop.dart';

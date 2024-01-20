@@ -1,10 +1,10 @@
 // ignore_for_file: no_logic_in_create_state, must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/file_box.dart';
-import 'package:cheetah_netdesk/components/nodata.dart';
-import 'package:cheetah_netdesk/controller/file_controller.dart';
-import 'package:cheetah_netdesk/models/file_model.dart';
+import 'package:cheetah_netdisk/components/file_box.dart';
+import 'package:cheetah_netdisk/components/nodata.dart';
+import 'package:cheetah_netdisk/controller/file_controller.dart';
+import 'package:cheetah_netdisk/models/file_model.dart';
 
 class FileTree extends StatefulWidget {
   FileTree(

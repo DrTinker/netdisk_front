@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/file_tree.dart';
-import 'package:cheetah_netdesk/components/video_player.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/conf/file.dart';
+import 'package:cheetah_netdisk/components/file_tree.dart';
+import 'package:cheetah_netdisk/components/video_player.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/conf/file.dart';
 import 'package:get/get.dart';
 
 import '../../controller/file_controller.dart';

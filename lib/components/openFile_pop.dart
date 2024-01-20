@@ -2,13 +2,13 @@
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/select_pop.dart';
-import 'package:cheetah_netdesk/components/toast.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/conf/file.dart';
-import 'package:cheetah_netdesk/controller/file_controller.dart';
-import 'package:cheetah_netdesk/controller/trans_controller.dart';
-import 'package:cheetah_netdesk/controller/user_controller.dart';
+import 'package:cheetah_netdisk/components/select_pop.dart';
+import 'package:cheetah_netdisk/components/toast.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/conf/file.dart';
+import 'package:cheetah_netdisk/controller/file_controller.dart';
+import 'package:cheetah_netdisk/controller/trans_controller.dart';
+import 'package:cheetah_netdisk/controller/user_controller.dart';
 import 'package:get/get.dart';
 
 

@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:cheetah_netdesk/controller/user_controller.dart';
-import 'package:cheetah_netdesk/helper/parse.dart';
+import 'package:cheetah_netdisk/controller/user_controller.dart';
+import 'package:cheetah_netdisk/helper/parse.dart';
 
 import 'package:get/get.dart';
 

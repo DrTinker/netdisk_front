@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 
-import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
 import 'package:http/http.dart';
 
 // 通过路径读取，用于大文件

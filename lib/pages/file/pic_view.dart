@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/models/file_model.dart';
+import 'package:cheetah_netdisk/models/file_model.dart';
 import 'package:get/get.dart';
 
 import '../../components/pic_viewer.dart';

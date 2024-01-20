@@ -1,9 +1,9 @@
 // ignore_for_file: no_logic_in_create_state, no_leading_underscores_for_local_identifiers, must_be_immutable
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/controller/share_controller.dart';
-import 'package:cheetah_netdesk/components/toast.dart';
-import 'package:cheetah_netdesk/helper/parse.dart';
-import 'package:cheetah_netdesk/models/share_model.dart';
+import 'package:cheetah_netdisk/controller/share_controller.dart';
+import 'package:cheetah_netdisk/components/toast.dart';
+import 'package:cheetah_netdisk/helper/parse.dart';
+import 'package:cheetah_netdisk/models/share_model.dart';
 import 'package:get/get.dart';
 import '../conf/const.dart';
 

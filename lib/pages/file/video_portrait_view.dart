@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/video_player.dart';
+import 'package:cheetah_netdisk/components/video_player.dart';
 import 'package:get/get.dart';
 import  'package:flutter/services.dart';
 import '../../controller/file_controller.dart';

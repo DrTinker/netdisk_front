@@ -1,9 +1,9 @@
 // ignore_for_file: no_logic_in_create_state, must_be_immutable, prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/controller/trans_controller.dart';
-import 'package:cheetah_netdesk/models/trans_model.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/controller/trans_controller.dart';
+import 'package:cheetah_netdisk/models/trans_model.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 

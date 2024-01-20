@@ -1,4 +1,4 @@
-import 'package:cheetah_netdesk/models/user_model.dart';
+import 'package:cheetah_netdisk/models/user_model.dart';
 import 'package:get/get.dart';
 
 import '../components/toast.dart';

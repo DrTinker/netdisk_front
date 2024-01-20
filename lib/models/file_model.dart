@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
 
 import '../conf/file.dart';
 

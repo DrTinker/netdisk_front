@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/trans_list.dart';
-import 'package:cheetah_netdesk/components/trans_task_pop.dart';
-import 'package:cheetah_netdesk/conf/const.dart';
-import 'package:cheetah_netdesk/conf/navi.dart';
-import 'package:cheetah_netdesk/controller/trans_controller.dart';
+import 'package:cheetah_netdisk/components/trans_list.dart';
+import 'package:cheetah_netdisk/components/trans_task_pop.dart';
+import 'package:cheetah_netdisk/conf/const.dart';
+import 'package:cheetah_netdisk/conf/navi.dart';
+import 'package:cheetah_netdisk/controller/trans_controller.dart';
 import 'package:get/get.dart';
 
 import '../../components/bottom_bar.dart';

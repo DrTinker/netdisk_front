@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cheetah_netdesk/components/toast.dart';
-import 'package:cheetah_netdesk/controller/share_controller.dart';
+import 'package:cheetah_netdisk/components/toast.dart';
+import 'package:cheetah_netdisk/controller/share_controller.dart';
 import 'package:get/get.dart';
 
 import '../../controller/file_controller.dart';
