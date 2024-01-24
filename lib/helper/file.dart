@@ -75,7 +75,7 @@ Future<bool> mergeFile(String srcDir, String desFile) async {
       des.deleteSync();
     }
     des.createSync(recursive: true);
-    // 获取所有子文件
+    // 获取所有子文件 这里按照数字顺序获取分片文件
     List<FileSystemEntity> chunks = src.listSync().toList();
     print("len: ${chunks.length}");
     // 追加写入文件

@@ -1,4 +1,4 @@
-const baseUrl = "http://192.168.0.120:8081";
+const baseUrl = "http://ip:8081";
 
 const loginUrl = "$baseUrl/user/login";
 const userRenameUrl = "$baseUrl/user/rename";
@@ -17,8 +17,8 @@ const moveUrl = "$baseUrl/object/batch/move";
 const deleteUrl = "$baseUrl/object/batch/delete";
 const fileRenameUrl = "$baseUrl/object/rename";
 const preSignUrl = "$baseUrl/object/token";
-const downloadTotalUrl = "$baseUrl/trans/download/total";
 
+const downloadTotalUrl = "$baseUrl/trans/download/total";
 const uploadUrl = "$baseUrl/trans/upload/total";
 const initUploadPartUrl = "$baseUrl/trans/upload/init";
 const uploadPartUrl = "$baseUrl/trans/upload/part";

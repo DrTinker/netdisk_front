@@ -259,7 +259,7 @@ class FileController extends GetxController {
   // 网络请求
   // 获取单个文件
   getFileInfo(String uuid) async {
-    Map<String, String> params = {'file_uuid': uuid};
+    Map<String, String> params = {'fileID': uuid};
     await NetWorkHelper.requestGet(
         fileInfoUrl,
         // success
@@ -300,13 +300,13 @@ class FileController extends GetxController {
       'Authorization': token,
     };
     Map<String, String> params1 = {
-      'parent_uuid': curDir,
+      'parent': curDir,
       'page': page.toString(),
     };
     await NetWorkHelper.requestGet(
       url,
       (data) {
-        var fileList = data['file_list'];
+        var fileList = data['fileList'];
         // 刷新清空
         if (!append) {
           fileObjs.clear();
@@ -366,12 +366,12 @@ class FileController extends GetxController {
     };
     Map<String, String> body = {
       'name': newFolderName,
-      'parent_uuid': curDir,
+      'parent': curDir,
     };
     await NetWorkHelper.requestPost(
       url,
       (data) {
-        print('创建成功: ${data['file_id']}');
+        print('创建成功: ${data['fileID']}');
         Get.snackbar("提示", "文件创建成功");
       },
       body: body,
@@ -412,7 +412,7 @@ class FileController extends GetxController {
             resultHandler(data);
           },
           headers: headers,
-          body: {'Des': desID, 'Src': srcIDList},
+          body: {'des': desID, 'src': srcIDList},
           transform: JSONConvert.create(),
           error: (code, error) {
             MsgToast().serverErrToast();
@@ -426,7 +426,7 @@ class FileController extends GetxController {
             resultHandler(data);
           },
           headers: headers,
-          body: {'Des': desID, 'Src': srcIDList},
+          body: {'des': desID, 'src': srcIDList},
           transform: JSONConvert.create(),
           error: (code, error) {
             MsgToast().serverErrToast();
@@ -440,7 +440,7 @@ class FileController extends GetxController {
             resultHandler(data);
           },
           headers: headers,
-          body: {'Des': '', 'Src': srcIDList},
+          body: {'des': '', 'src': srcIDList},
           transform: JSONConvert.create(),
           error: (code, error) {
             MsgToast().serverErrToast();
@@ -481,7 +481,7 @@ class FileController extends GetxController {
         MsgToast().customeToast('文件操作成功');
       },
       headers: {'Authorization': token},
-      body: {'file_uuid': id, 'name': fullname},
+      body: {'fileID': id, 'name': fullname},
       transform: JSONConvert.create(),
       error: (code, error) {
         MsgToast().serverErrToast();

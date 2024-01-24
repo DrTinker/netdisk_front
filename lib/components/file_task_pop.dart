@@ -100,7 +100,7 @@ class _FileTaskPopContentState extends State<FileTaskPopContent> {
           },);
           // 创建Share
           String fullName = '${file!.name}.${file!.ext}';
-          ShareObj share = ShareObj(file!.userUuid, file!.uuid, fullName);
+          ShareObj share = ShareObj(file!.userID, file!.fileID, fullName);
           SharePop().showPop(share, fc.token);
           // 清理task
           fc.clearTaskMap();

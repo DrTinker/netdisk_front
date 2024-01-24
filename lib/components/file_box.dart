@@ -31,7 +31,7 @@ class _FileBoxState extends State<FileBox> {
     Widget _getTrailing() {
       FileObj obj = fc.fileObjs[index];
       setState(() {
-        _isSelect = fc.taskMap.containsKey(obj.uuid);
+        _isSelect = fc.taskMap.containsKey(obj.fileID);
       });
       Widget trail = Checkbox(
         value: _isSelect,
@@ -41,10 +41,10 @@ class _FileBoxState extends State<FileBox> {
           });
           // 加入taskList
           if (_isSelect) {
-            fc.taskMap[obj.uuid] = obj;
+            fc.taskMap[obj.fileID] = obj;
             print('taskMap: ${fc.taskMap}');
           } else {
-            fc.taskMap.remove(obj.uuid);
+            fc.taskMap.remove(obj.fileID);
             // 任务队列被清空时隐藏任务按钮
             if (fc.taskMap.isEmpty) {
               fc.switchShowAddTask(false);
@@ -88,14 +88,14 @@ class _FileBoxState extends State<FileBox> {
       // 如果是分享，则只允许触发文件夹的handler
       if (fc.banRootRefresh) {
         if (obj.ext=='folder') {
-          fc.enter(obj.uuid, obj.name);
+          fc.enter(obj.fileID, obj.name);
         }
         return;
       }
       // 如果不是分享情况，则按后缀名处理
       switch (obj.ext) {
         case "folder":
-          fc.enter(obj.uuid, obj.name);
+          fc.enter(obj.fileID, obj.name);
           break;
         // pic
         case "jpg":
@@ -156,7 +156,7 @@ class _FileBoxState extends State<FileBox> {
         // 允许选择，则长按出现选择按钮
         if (select) {
           FileObj obj = fc.fileObjs[index];
-          fc.taskMap[obj.uuid] = obj;
+          fc.taskMap[obj.fileID] = obj;
           fc.switchShowAddTask(true);
         }
       },

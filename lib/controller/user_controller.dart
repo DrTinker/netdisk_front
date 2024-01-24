@@ -104,6 +104,7 @@ class UserController extends GetxController {
             return;
           }
         },
+        headers: {'Content-Type': "application/json"},
         params: {'code': code},
         body: body,
         transform: JSONConvert.create(),

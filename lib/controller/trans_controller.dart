@@ -152,7 +152,7 @@ class TransController extends GetxController {
       String path = await getDownloadDir(fullName, downloadPath);
       TransObj obj =
           TransObj(fullName, file.ext, path, file.size, parentId, transProcess);
-      obj.fileUuid = file.uuid;
+      obj.fileID = file.fileID;
       obj.running = processWait;
       obj.remotePath = downloadPath;
       // 加入队列
@@ -228,11 +228,11 @@ class TransController extends GetxController {
     Map<String, String> body = {
       'hash': trans.hash,
       'name': trans.fullName,
-      'local_path': trans.localPath,
-      'remote_path': trans.remotePath,
-      'parent_uuid': trans.parentId,
+      'localPath': trans.localPath,
+      'remotePath': trans.remotePath,
+      'parent': trans.parentID,
       'size': (trans.totalSize).toString(),
-      'upload_id': trans.transID
+      'uploadID': trans.transID
     };
     await NetWorkHelper.requestPost(
       initUploadPartUrl,
@@ -252,13 +252,13 @@ class TransController extends GetxController {
         }
         // 非秒传，获取数据
         if (code == httpSuccessCode) {
-          trans.transID = data['upload_id'];
-          trans.chunkCount = data['chunk_count'];
-          trans.chunkSize = data['chunk_size'];
+          trans.transID = data['uploadID'];
+          trans.chunkCount = data['chunkCount'];
+          trans.chunkSize = data['chunkSize'];
           // 先清空
           trans.chunkList.clear();
-          if (data['chunk_list'] != null) {
-            for (var chunk in data['chunk_list']) {
+          if (data['chunkList'] != null) {
+            for (var chunk in data['chunkList']) {
               trans.chunkList.add(chunk);
             }
           }
@@ -312,8 +312,8 @@ class TransController extends GetxController {
           // 执行上传
           Map<String, dynamic> body = {
             'files': postData,
-            'upload_id': trans.transID,
-            'chunk_num': c,
+            'uploadID': trans.transID,
+            'chunkNum': c,
           };
           // 记录curSize
           int tmpSize = trans.curSize;
@@ -364,7 +364,7 @@ class TransController extends GetxController {
       'Authorization': token,
     };
     Map<String, dynamic> body = {
-      'upload_id': trans.transID,
+      'uploadID': trans.transID,
     };
     await NetWorkHelper.requestPost(
       completeUploadPartUrl,
@@ -419,8 +419,8 @@ class TransController extends GetxController {
     Map<String, dynamic> body = {
       'hash': trans.hash,
       'name': trans.fullName,
-      'remote_path': trans.remotePath,
-      'parent_uuid': trans.parentId,
+      'remotePath': trans.remotePath,
+      'parent': trans.parentID,
     };
     await NetWorkHelper.fileUplod(
       uploadUrl,
@@ -431,7 +431,7 @@ class TransController extends GetxController {
         if (code == quickUploadCode || code == httpSuccessCode) {
           // 设置进度为100
           trans.curSize = trans.totalSize;
-          trans.transID = data['upload_id'];
+          trans.transID = data['uploadID'];
           // 加入成功队列
           bool flag = uploadList.removeTrans(trans);
           if (flag) {
@@ -479,11 +479,11 @@ class TransController extends GetxController {
       'Authorization': token,
     };
     Map<String, String> param = {
-      "file_uuid": trans.fileUuid,
-      'local_path': trans.localPath,
-      'remote_path': trans.remotePath,
-      'parent_uuid': trans.parentId,
-      'download_id': trans.transID
+      "fileID": trans.fileID,
+      'localPath': trans.localPath,
+      'remotePath': trans.remotePath,
+      'parent': trans.parentID,
+      'downloadID': trans.transID
     };
     bool flag = true;
     await NetWorkHelper.requestGet(
@@ -492,15 +492,15 @@ class TransController extends GetxController {
         int code = data['code'];
         // 初始化成功
         if (code == httpSuccessCode) {
-          trans.transID = data['download_id'];
-          trans.chunkCount = data['chunk_count'];
-          trans.chunkSize = data['chunk_size'];
+          trans.transID = data['downloadID'];
+          trans.chunkCount = data['chunkCount'];
+          trans.chunkSize = data['chunkSize'];
           trans.hash = data['hash'];
           trans.url = data['url'];
           // 先清空
           trans.chunkList.clear();
-          if (data['chunk_list'] != null) {
-            for (var chunk in data['chunk_list']) {
+          if (data['chunkList'] != null) {
+            for (var chunk in data['chunkList']) {
               trans.chunkList.add(chunk);
             }
           }
@@ -576,6 +576,7 @@ class TransController extends GetxController {
       }
       // 分块地址
       String partDir = await getPartDir(trans.hash, trans.remotePath);
+      // 此处是根据数字排序文件的，不用担心
       String partPath = '$partDir/$c.${trans.ext}';
       // 记录curSize
       int tmpSize = trans.curSize;
@@ -609,8 +610,8 @@ class TransController extends GetxController {
       }
       // 通知服务端修改数据记录
       Map<String, String> param = {
-        'download_id': trans.transID,
-        'chunk_num': c.toString(),
+        'downloadID': trans.transID,
+        'chunkNum': c.toString(),
       };
       Map<String, String> header = {
         'Authorization': token,
@@ -657,7 +658,7 @@ class TransController extends GetxController {
       'Authorization': token,
     };
     Map<String, String> param = {
-      'download_id': trans.transID,
+      'downloadID': trans.transID,
     };
     await NetWorkHelper.requestGet(
       completeDownloadPartUrl,
@@ -694,10 +695,10 @@ class TransController extends GetxController {
     trans.startTime = DateTime.now().microsecondsSinceEpoch;
     trans.startSize = trans.curSize;
     Map<String, String> param = {
-      "file_uuid": trans.fileUuid,
-      'local_path': trans.localPath,
-      'remote_path': trans.remotePath,
-      'parent_uuid': trans.parentId,
+      "fileID": trans.fileID,
+      'localPath': trans.localPath,
+      'remotePath': trans.remotePath,
+      'parent': trans.parentID,
     };
     Map<String, String> headers = {
       'Authorization': token,
@@ -710,8 +711,8 @@ class TransController extends GetxController {
         // 合并成功
         if (code == httpSuccessCode) {
           // 获取预签名
-          sign = data['file_token'];
-          trans.transID = data['download_id'];
+          sign = data['fileToken'];
+          trans.transID = data['downloadID'];
           return;
         }
         // 发生错误
@@ -771,7 +772,7 @@ class TransController extends GetxController {
       'Authorization': token,
     };
     Map<String, dynamic> body = {
-      'trans_uuid': obj.transID,
+      'transID': obj.transID,
     };
 
     NetWorkHelper.requestPost(
@@ -803,7 +804,7 @@ class TransController extends GetxController {
       srcIDList.add(key);
     });
     Map<String, dynamic> body = {
-      'Src': srcIDList,
+      'src': srcIDList,
     };
 
     await NetWorkHelper.requestPost(

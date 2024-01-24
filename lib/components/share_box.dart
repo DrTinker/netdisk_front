@@ -44,7 +44,7 @@ class _ShareBoxState extends State<ShareBox> {
     Widget _getTrailing() {
       ShareObj obj = shareList[index];
       setState(() {
-        _isSelect = sc.taskMap.containsKey(obj.uuid);
+        _isSelect = sc.taskMap.containsKey(obj.shareID);
       });
       Widget trail = Checkbox(
         value: _isSelect,
@@ -54,10 +54,10 @@ class _ShareBoxState extends State<ShareBox> {
           });
           // 加入taskList
           if (_isSelect) {
-            sc.taskMap[obj.uuid] = obj;
+            sc.taskMap[obj.shareID] = obj;
             print('taskMap: ${sc.taskMap}');
           } else {
-            sc.taskMap.remove(obj.uuid);
+            sc.taskMap.remove(obj.shareID);
             // 任务队列被清空时隐藏任务按钮
             if (sc.taskMap.isEmpty) {
               sc.switchShowAddTask(false);
@@ -107,7 +107,7 @@ class _ShareBoxState extends State<ShareBox> {
       },
       onLongPress: () {
         ShareObj obj = shareList[index];
-        sc.taskMap[obj.uuid] = obj;
+        sc.taskMap[obj.shareID] = obj;
         sc.switchShowAddTask(true);
       },
     );

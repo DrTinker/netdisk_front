@@ -78,7 +78,7 @@ class ShareController extends GetxController {
     await NetWorkHelper.requestGet(
       shareListUrl,
       (data) {
-        var share_list = data['share_list'];
+        var shareList = data['shareList'];
         // 刷新清空
         if (!append) {
           shareAllList.clear();
@@ -86,8 +86,8 @@ class ShareController extends GetxController {
           // 刷新则重置页码
           page = 1;
         }
-        for (int i = 0; i < share_list.length; i++) {
-          ShareObj shareObj = ShareObj.fromMap(share_list[i]);
+        for (int i = 0; i < shareList.length; i++) {
+          ShareObj shareObj = ShareObj.fromMap(shareList[i]);
           shareAllList.add(shareObj);
           // TODO 处理同一页重复请求错误
           // indexMap[transObj] = i;
@@ -124,11 +124,11 @@ class ShareController extends GetxController {
   // 创建分享
   static createShare(ShareObj obj, String token) async {
     Map<String, String> body = {
-      'share_uuid': obj.uuid,
-      'file_uuid': obj.fileUuid,
+      'shareID': obj.shareID,
+      'fileID': obj.fileID,
       'code': obj.code!,
       'fullname': obj.fullName,
-      'expire_at': obj.expireAt!
+      'expireAt': obj.expireAt!
     };
     await NetWorkHelper.requestPost(
       shareSetUrl,
@@ -151,7 +151,7 @@ class ShareController extends GetxController {
                       side: BorderSide(style: BorderStyle.none)))),
               child: Text('复制口令到剪切板'),
               onPressed: () {
-                Clipboard.setData(ClipboardData(text: data['share_id']));
+                Clipboard.setData(ClipboardData(text: data['shareID']));
                 MsgToast().customeToast('口令已复制');
                 Get.back();
               },
@@ -196,7 +196,7 @@ class ShareController extends GetxController {
           // 获取当前分享详情
           curShare = ShareObj.fromMap(data['info']);
           // 获取分享人
-          curOwner = await UserController.getUserProfile(curShare!.userUuid, token);
+          curOwner = await UserController.getUserProfile(curShare!.userID, token);
           update();
           return;
         }
@@ -208,7 +208,7 @@ class ShareController extends GetxController {
       headers: {
         'Authorization': token,
       },
-      params: {'share_uuid': uuid},
+      params: {'shareID': uuid},
       transform: JSONConvert.create(),
       error: (statusCode, error) {
         print(error);
@@ -238,7 +238,7 @@ class ShareController extends GetxController {
         MsgToast().customeToast('取消成功');
       },
       headers: headers,
-      body: {'Des': "", 'Src': targets},
+      body: {'des': "", 'src': targets},
       transform: JSONConvert.create(),
       error: (code, error) {
         MsgToast().serverErrToast();
@@ -251,9 +251,9 @@ class ShareController extends GetxController {
   // 获取文件
   updateShare(ShareObj obj) async{
     Map<String, String> body = {
-      'share_uuid': obj.uuid,
+      'shareID': obj.shareID,
       'code': obj.code!,
-      'expire_at': obj.expireAt!
+      'expireAt': obj.expireAt!
     };
     await NetWorkHelper.requestPost(
       shareUpdateUrl,

@@ -110,7 +110,7 @@ class ShareDetailPage extends GetView<ShareController> {
           child: Text('取消分享'),
           onPressed: () async {
             // 取消分享
-            await sc.cancelShare(uuid: share.uuid);
+            await sc.cancelShare(uuid: share.shareID);
             // 跳转确认界面
             Get.toNamed('/share_cancel');
           },
@@ -124,7 +124,7 @@ class ShareDetailPage extends GetView<ShareController> {
                 child: Text('复制链接'),
                 onPressed: () async {
                   // 复制口令到剪切板
-                  Clipboard.setData(ClipboardData(text: share.uuid));
+                  Clipboard.setData(ClipboardData(text: share.shareID));
                   MsgToast().customeToast('口令已复制');
                 },
               )

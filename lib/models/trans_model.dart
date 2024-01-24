@@ -13,7 +13,7 @@ import '../helper/net.dart';
 class TransObj {
   // 基本信息
   String transID = ""; // 传输uuid
-  String fileUuid = ""; // 文件file_uuid
+  String fileID = ""; // 文件file_uuid
   Widget? icon;
   String fullName = "";
   String ext = "";
@@ -21,7 +21,7 @@ class TransObj {
   String localPath = ""; // 本地文件地址
   String remotePath=""; // 用户空间中的路径
   String fileKey = ""; // 云端地址
-  String parentId = ""; // 父节点file_uuid
+  String parentID = ""; // 父节点file_uuid
   int totalSize = 0; // 文件总大小
   int curSize = 0; // 已上传大小
   int startSize = 0; // 开始传输时的大小
@@ -36,27 +36,27 @@ class TransObj {
   List<int> chunkList = []; // 已上传的分块列表
 
   static TransObj fromMap(Map trans) {
-    String fullName = trans['Name'] + "." + trans['Ext'];
-    String ext = trans['Ext'];
-    String local = trans['Local_Path'];
-    int totalSize = trans['Size'];
-    String parentId = trans['Parent_Uuid'];
-    int status = trans['Status'];
+    String fullName = trans['name'] + "." + trans['ext'];
+    String ext = trans['ext'];
+    String local = trans['localPath'];
+    int totalSize = trans['size'];
+    String parentId = trans['parent'];
+    int status = trans['status'];
     TransObj obj = TransObj(fullName, ext, local, totalSize, parentId, status);
-    obj.transID = trans['Uuid'];
-    obj.fileUuid = trans['File_Uuid'];
-    obj.hash = trans['Hash'];
-    obj.curSize = trans['CurSize'];
+    obj.transID = trans['transID'];
+    obj.fileID = trans['fileID'];
+    obj.hash = trans['hash'];
+    obj.curSize = trans['curSize'];
     obj.startSize = obj.curSize;
-    obj.remotePath = trans['Remote_Path'];
+    obj.remotePath = trans['remotePath'];
     
     // 处理最后一个分片不满的情况
     if (obj.curSize > obj.totalSize) {
       obj.curSize = obj.totalSize;
     }
-    obj.chunkSize = trans['ChunkSize'];
-    if (trans['chunk_list'] != null) {
-      for (var chunk in trans['ChunkList']) {
+    obj.chunkSize = trans['chunkSize'];
+    if (trans['chunkList'] != null) {
+      for (var chunk in trans['chunkList']) {
         obj.chunkList.add(int.parse(chunk));
       }
     }
@@ -74,7 +74,7 @@ class TransObj {
     localPath = local!;
     // 默认在根路径下
     if (parentId != null) {
-      this.parentId = parentId;
+      parentID = parentId;
     } else {
       var store = SyncStorage();
       if (store.hasKey(userStartDir)) {
@@ -136,7 +136,7 @@ class TransList {
     await NetWorkHelper.requestGet(
       transInfoUrl,
       (data) {
-        var trans_list = data['trans_list'];
+        var trans_list = data['transList'];
         // 刷新清空
         if (!append) {
           clearList();

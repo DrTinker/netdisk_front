@@ -5,9 +5,9 @@ import 'package:cheetah_netdisk/helper/parse.dart';
 import '../conf/file.dart';
 
 class ShareObj {
-  String uuid = "";
-  String userUuid = "";
-  String fileUuid = "";
+  String shareID = "";
+  String userID = "";
+  String fileID = "";
   String fullName = "";
   String? code;
   String? expireAt;
@@ -17,20 +17,20 @@ class ShareObj {
   Widget? icon;
 
   static ShareObj fromMap(Map share) {
-    String uuid = share['Uuid'];
-    String fullName = share['Fullname'];
-    String user = share['User_Uuid'];
-    String file = share['User_File_Uuid'];
-    String code = share['Code'];
-    String expire = share['Expire_Time'];
+    String uuid = share['shareID'];
+    String fullName = share['fullname'];
+    String user = share['userID'];
+    String file = share['fileID'];
+    String code = share['code'];
+    String expire = share['expireTime'];
     ShareObj obj = ShareObj(user, file, fullName);
     obj.code = code;
-    obj.uuid = uuid;
+    obj.shareID = uuid;
     obj.expireAt = expire;
-    obj.createdAt = share['CreatedAt']!;
-    obj.updatedAt = share['UpdatedAt']!;
-    if (share.containsKey('Status')) {
-      obj.status = share['Status'];
+    obj.createdAt = share['createdAt']!;
+    obj.updatedAt = share['updatedAt']!;
+    if (share.containsKey('status')) {
+      obj.status = share['status'];
     }
     // 图标
     String ext = splitName(fullName)[1];
@@ -43,7 +43,7 @@ class ShareObj {
   }
 
   ShareObj(String user, file, this.fullName) {
-    userUuid = user;
-    fileUuid = file;
+    userID = user;
+    fileID = file;
   }
 }

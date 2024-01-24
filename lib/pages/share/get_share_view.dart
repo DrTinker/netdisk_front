@@ -27,7 +27,7 @@ class GetSharePage extends GetView<ShareController> {
     }
 
     // 通过id获取文件信息
-    fc.getFileInfo(sc.curShare!.fileUuid);
+    fc.getFileInfo(sc.curShare!.fileID);
 
     return GetBuilder<FileController>(
         global: false,
@@ -59,10 +59,9 @@ class GetSharePage extends GetView<ShareController> {
                 FileController outerFC =
                     Get.find<FileController>(tag: fcPerTag);
                 // 将内层的taskMap复制过去
-                outerFC.taskMap = fc.taskMap;
+                outerFC.taskMap = Map.from(fc.taskMap);
                 // 打开弹窗选择目标文件夹
                 SelectPop().showPop(outerFC, copyCode);
-                fc.clearTaskMap();
               },
             ),
           ),
@@ -75,7 +74,6 @@ class GetSharePage extends GetView<ShareController> {
                 String downloadPath = fc.getNameListAsPath();
                 await tc.addToDownload(fc.curDir, downloadPath, fc.taskMap);
                 MsgToast().customeToast('文件已加入下载队列');
-                fc.clearTaskMap();
               },
             ),
           ),
@@ -110,7 +108,7 @@ class GetSharePage extends GetView<ShareController> {
               if (!fc.isRoot()) {
                 // 在root上一层，则返回时只渲染分享的文件
                 if (fc.dirList.length == 2) {
-                  fc.back(uuid: sc.curShare!.fileUuid);
+                  fc.back(uuid: sc.curShare!.fileID);
                 } else {
                   fc.back();
                 }
