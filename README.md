@@ -46,6 +46,10 @@ flutter build apk
 ## Usage
 
 app运行截图
+![image1](https://github.com/DrTinker/NetDisk_front/blob/main/sample/01.jpg)
+![image1](https://github.com/DrTinker/NetDisk_front/blob/main/sample/02.jpg)
+![image1](https://github.com/DrTinker/NetDisk_front/blob/main/sample/03.jpg)
+![image1](https://github.com/DrTinker/NetDisk_front/blob/main/sample/04.jpg)
 
 
 
