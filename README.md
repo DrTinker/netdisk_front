@@ -14,7 +14,7 @@
 4. 媒体处理：图片预览、音视频播放器
 5. 文件分享：生成已上传文件分享链接，设置提取码及过期时间，通过口令提取分享文件
 
-后端代码地址: https://github.com/DrTinker/cheetah_NetDisk
+后端代码地址: https://github.com/DrTinker/cheetah_netdisk
 
 
 
